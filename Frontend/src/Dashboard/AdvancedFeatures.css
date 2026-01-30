@@ -1,0 +1,777 @@
+/* Main container for the Advanced Features section */
+.advanced-features {
+  /* Ensure the section takes up most of the viewport height */
+  min-height: 90vh;
+  /* Add padding to prevent content from hitting the edges */
+  padding: 40px;
+  /* Ultra-premium mesh gradient background with multiple color stops */
+  background: radial-gradient(at 0% 0%, rgba(102, 126, 234, 0.08) 0, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(118, 75, 162, 0.05) 0, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(102, 126, 234, 0.08) 0, transparent 50%),
+    #ffffff;
+  /* Use flexbox with a column layout for vertical structure */
+  display: flex;
+  flex-direction: column;
+  /* Relative positioning for decorative background elements */
+  position: relative;
+  /* Hide overflow to contain decorative blobs */
+  overflow: hidden;
+  /* Animate appearance for a premium feel */
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keyframes for the sophisticated fade-in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Decorative background blob 1 */
+.bg-blob-1 {
+  position: absolute;
+  top: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  animation: pulse 10s infinite alternate ease-in-out;
+}
+
+/* Decorative background blob 2 */
+.bg-blob-2 {
+  position: absolute;
+  bottom: -150px;
+  left: -150px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(118, 75, 162, 0.08) 0%, transparent 70%);
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
+  animation: pulse 12s infinite alternate-reverse ease-in-out;
+}
+
+/* Pulse animation for background blobs */
+@keyframes pulse {
+  0% {
+    transform: scale(1) translate(0, 0);
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: scale(1.1) translate(30px, -30px);
+    opacity: 0.8;
+  }
+}
+
+/* Header section containing navigation controls */
+.features-nav-header {
+  /* Use flexbox to space out header elements */
+  display: flex;
+  flex-direction: column;
+  /* Center horizontally */
+  align-items: center;
+  /* Add gap between rows of buttons */
+  gap: 32px;
+  /* Add space below the header */
+  margin-bottom: 48px;
+  /* Ensure the header takes full width */
+  width: 100%;
+  /* Raise above background blobs */
+  z-index: 10;
+}
+
+/* Container for top navigation buttons */
+.top-nav-buttons {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+/* Shared styles for primary navigation buttons */
+.main-back-btn,
+.menu-back-btn {
+  /* Use a vibrant blue-to-indigo gradient with high contrast */
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  /* White text for contrast */
+  color: white;
+  /* Remove default button borders */
+  border: none;
+  /* Generous padding for a clickable target */
+  padding: 14px 28px;
+  /* Large rounded corners for a modern feel */
+  border-radius: 18px;
+  /* Use bold weight for readability */
+  font-weight: 600;
+  /* Pointer cursor to indicate interactivity */
+  cursor: pointer;
+  /* Sophisticated cubic-bezier transition */
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Apply a layered shadow for depth */
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 25px -5px rgba(79, 70, 229, 0.1);
+  /* Use flexbox to align icon and text */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  /* Add font size for prominence */
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+/* Secondary style for the menu-back button to distinguish it */
+.menu-back-btn {
+  /* Use a softer purple-to-blue gradient */
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+}
+
+/* Hover state for navigation buttons */
+.main-back-btn:hover,
+.menu-back-btn:hover {
+  /* Slight lift and scale effect */
+  transform: translateY(-3px) scale(1.02);
+  /* Intenisfy shadow on hover */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 25px 30px -5px rgba(79, 70, 229, 0.2);
+  /* Lightness increase */
+  filter: brightness(1.1);
+}
+
+/* Container for the horizontal tab buttons with ultra-glassmorphism */
+.features-tabs {
+  /* Use flexbox for horizontal layout */
+  display: flex;
+  /* Center the tabs */
+  justify-content: center;
+  /* Add spacing between buttons */
+  gap: 8px;
+  /* Advanced glassmorphism effect */
+  background: rgba(255, 255, 255, 0.4);
+  padding: 8px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(16px) saturate(180%);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+/* Individual tab button styling */
+.features-tabs button {
+  /* Padding for comfortable clicking */
+  padding: 12px 24px;
+  /* Rounded tabs */
+  border-radius: 18px;
+  /* Border to match the theme when active */
+  border: 1px solid transparent;
+  /* Default background is transparent */
+  background: transparent;
+  /* Muted indigo for inactive text */
+  color: #6366f1;
+  /* High weight */
+  font-weight: 600;
+  /* Pointer cursor */
+  cursor: pointer;
+  /* Smooth transitions */
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Font size */
+  font-size: 0.95rem;
+}
+
+/* Active tab button styling */
+.features-tabs button.active {
+  /* Pure white background for high contrast */
+  background: white;
+  /* Standard primary color text */
+  color: #4f46e5;
+  /* Distinct shadow for depth */
+  box-shadow: 0 8px 15px -3px rgba(79, 70, 229, 0.15);
+}
+
+/* Hover state for tab buttons */
+.features-tabs button:not(.active):hover {
+  /* Light background tint */
+  background: rgba(255, 255, 255, 0.6);
+  /* Slightly darker text */
+  color: #4338ca;
+}
+
+/* Grid layout for the landing menu cards */
+.features-menu-grid {
+  /* Use flex container centered */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  /* Add generous spacing between cards */
+  gap: 32px;
+  /* Padding for grid edges */
+  padding: 4px;
+  /* Max width for readability */
+  max-width: 1200px;
+  /* Center the grid horizontally */
+  margin: 0 auto;
+  /* Ensure it is above background decorative blobs */
+  z-index: 10;
+  position: relative;
+}
+
+/* Individual feature menu card styling - Ultra Premium */
+.menu-card {
+  /* Multi-layered background for depth */
+  background: rgba(255, 255, 255, 0.7);
+  /* Rounded corners */
+  border-radius: 32px;
+  /* Padding within the card */
+  padding: 40px 32px;
+  /* Center elements within the card */
+  text-align: center;
+  /* Pointer cursor */
+  cursor: pointer;
+  /* Professional cubic-bezier transition for smooth feel */
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  /* White border with transparency for glass look */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  /* Modern soft shadow */
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  /* Vertical flex for content */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  /* Blur background behind card */
+  backdrop-filter: blur(12px);
+  /* Add a subtle inner glow */
+  box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.5), 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+/* Hover state for menu cards - The "Wow" effect */
+.menu-card:hover {
+  /* Light lift and slight scale */
+  transform: translateY(-12px) scale(1.03);
+  /* Bright white backgorund */
+  background: rgba(255, 255, 255, 0.95);
+  /* Intense indigo glow shadow */
+  box-shadow: 0 30px 60px -12px rgba(79, 70, 229, 0.18), 0 18px 36px -18px rgba(0, 0, 0, 0.12);
+  /* Border color transition */
+  border-color: rgba(79, 70, 229, 0.2);
+}
+
+/* Style for the large icon in the card */
+.menu-card-icon {
+  /* Font size for the emoji/icon */
+  font-size: 4rem;
+  /* Add space below */
+  margin-bottom: 4px;
+  /* Transition for state changes */
+  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Icon animation on card hover */
+.menu-card:hover .menu-card-icon {
+  transform: scale(1.15) rotate(5deg);
+}
+
+/* Card heading styling */
+.menu-card h4 {
+  /* Dark indigo text */
+  color: #1e1b4b;
+  /* Larger font size */
+  font-size: 1.5rem;
+  /* Remove default margins */
+  margin: 0;
+  /* Extra bold */
+  font-weight: 800;
+  /* Tighten character spacing for modern look */
+  letter-spacing: -0.02em;
+}
+
+/* Card description styling */
+.menu-card p {
+  /* Soft indigo text */
+  color: #4338ca;
+  /* Standard description font size */
+  font-size: 1rem;
+  /* Good line height */
+  line-height: 1.6;
+  /* Remove default margins */
+  margin: 0;
+  /* Subtle transparency */
+  opacity: 0.8;
+}
+
+/* --- Global Sub-Module Styling (Fixing visibility and unstyled elements) --- */
+
+.feature-content {
+  /* Take up remaining height */
+  flex: 1;
+  /* Ensure it stays above background effects */
+  z-index: 10;
+  position: relative;
+}
+
+/* Wrapper for sub-feature content */
+.feature-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Common heading style for sub-features */
+.feature-container h3,
+.feature-container h4 {
+  color: #1e1b4b;
+  /* Deep Indigo for visibility */
+  font-weight: 800;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.feature-container h3 {
+  font-size: 2rem;
+  letter-spacing: -0.02em;
+}
+
+.feature-container h4 {
+  font-size: 1.5rem;
+}
+
+/* Critical Fix: Ensure labels and descriptive text are dark and visible */
+.feature-container p,
+.feature-container span,
+.feature-container label {
+  color: #334155;
+  /* Slate 700 for high legibility */
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+/* Premium Glassmorphic Card for Sub-Features */
+.lux-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 1);
+  padding: 40px;
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 30px;
+}
+
+/* Shared Premium Button Styling for all sub-features */
+.lux-button {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(79, 70, 229, 0.2);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.lux-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.3);
+  filter: brightness(1.1);
+}
+
+.lux-button:disabled {
+  background: #e2e8f0;
+  color: #94a3b8;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Secondary/Alternative button style */
+.lux-button-secondary {
+  background: white;
+  color: #4f46e5;
+  border: 1px solid #e2e8f0;
+}
+
+.lux-button-secondary:hover {
+  background: #f5f3ff;
+  border-color: #4f46e5;
+}
+
+/* --- Specific Feature Tweaks --- */
+
+/* Conversation Scenario Buttons */
+.scenario-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+/* Shadowing Section */
+.shadowing-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  align-items: center;
+}
+
+.sentence-display {
+  text-align: center;
+  width: 100%;
+}
+
+.sentence-display .sentence {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #1e1b4b;
+  margin: 20px 0;
+}
+
+/* Daily Challenge */
+.challenge-text {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #4f46e5;
+  text-align: center;
+  margin: 20px 0;
+}
+
+/* Recommendations/Tips */
+.recommendation-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.recommendation-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 16px;
+  border: 1px solid #f1f5f9;
+}
+
+.topic-name {
+  font-weight: 700;
+  color: #1e1b4b;
+}
+
+/* --- AI Tutor Styling: Midnight Sea Tinted Theme --- */
+
+.ai-tutor {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.ai-tutor-interface {
+  /* Midnight Sea tinted glass background - Deep Indigo tint */
+  background: rgba(15, 23, 42, 0.85);
+  /* Slate 900 tint */
+  border-radius: 32px;
+  /* Glowing border */
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  /* Vertical container */
+  display: flex;
+  flex-direction: column;
+  /* Fixed height for desktop */
+  height: 650px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(99, 102, 241, 0.05);
+  backdrop-filter: blur(24px) saturate(160%);
+  overflow: hidden;
+  /* Sharp professional look */
+  outline: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Scrolling messages container */
+.ai-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Premium message bubble for USER - Vibrant Gradient */
+.ai-message.user {
+  align-self: flex-end;
+  max-width: 80%;
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: white;
+  padding: 16px 24px;
+  border-radius: 20px 20px 4px 20px;
+  font-weight: 500;
+  box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+}
+
+/* Premium message bubble for AI - Tinted Slate */
+.ai-message.assistant {
+  align-self: flex-start;
+  max-width: 85%;
+  background: rgba(30, 41, 59, 0.8);
+  /* Slate 800 tinted */
+  color: #f1f5f9;
+  /* High contrast light text */
+  padding: 16px 24px;
+  border-radius: 20px 20px 20px 4px;
+  font-weight: 400;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* AI response thinking animation container */
+.ai-message.assistant.thinking {
+  color: #818cf8;
+  /* Lighter indigo */
+  font-weight: 600;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* AI message controls (e.g., play button) */
+.play-voice-btn {
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #a5b4fc;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.play-voice-btn:hover {
+  background: rgba(99, 102, 241, 0.2);
+  color: white;
+}
+
+/* Input container for chat - Matching dark theme */
+.ai-input {
+  padding: 24px 32px;
+  background: rgba(15, 23, 42, 0.5);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+/* Fancy input field - Dark mode variation */
+.ai-input input {
+  flex: 1;
+  background: rgba(30, 41, 59, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 16px;
+  font-size: 1rem;
+  transition: all 0.3s;
+}
+
+.ai-input input::placeholder {
+  color: #94a3b8;
+}
+
+.ai-input input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+  background: rgba(30, 41, 59, 1);
+}
+
+/* Send button in chat */
+.ai-input button:not(.voice-record-btn) {
+  background: #6366f1;
+  color: white;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.ai-input button:not(.voice-record-btn):disabled {
+  background: #334155;
+  color: #64748b;
+  cursor: not-allowed;
+}
+
+/* Voice recording button specific style */
+.voice-record-btn {
+  background: #1e293b;
+  color: #f1f5f9;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 14px 20px;
+  border-radius: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.voice-record-btn.recording {
+  background: #7f1d1d;
+  color: #fecaca;
+  border-color: #b91c1c;
+  animation: pulse-red 1.5s infinite;
+}
+
+@keyframes pulse-red {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+  }
+}
+
+/* --- Progress Dashboard Upgrades --- */
+
+/* Stat cards row styling */
+.progress-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+/* Ultra-white stat card */
+.stat-card {
+  flex: 1;
+  min-width: 250px;
+  background: white;
+  padding: 32px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+/* Stat card heading */
+.stat-card h4 {
+  color: #64748b;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  margin-bottom: 4px;
+}
+
+/* Stat card value */
+.stat-card p {
+  color: #1e293b;
+  font-size: 2.25rem;
+  font-weight: 800;
+}
+
+/* Badges display section */
+.badges-section {
+  background: white;
+  padding: 32px;
+  border-radius: 28px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+}
+
+.badges-section h4 {
+  margin-bottom: 24px;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #1e293b;
+}
+
+/* Individual badge styling */
+.badge {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  color: #92400e;
+  padding: 10px 20px;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin-right: 12px;
+  margin-bottom: 12px;
+  display: inline-block;
+  border: 1px solid #fcd34d;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* --- UI Responsiveness --- */
+
+@media (max-width: 768px) {
+
+  /* Reduce padding on mobile devices */
+  .advanced-features {
+    padding: 20px;
+  }
+
+  /* Stack tab navigation vertically */
+  .features-tabs {
+    flex-direction: column;
+    padding: 12px;
+    width: 100%;
+    border-radius: 20px;
+  }
+
+  /* Full width tab buttons on mobile */
+  .features-tabs button {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Reduce font sizes for smaller screens */
+  .menu-card h4 {
+    font-size: 1.25rem;
+  }
+
+  .menu-card-icon {
+    font-size: 3rem;
+  }
+
+  /* Ensure header takes full width and stacks */
+  .features-nav-header {
+    gap: 24px;
+  }
+
+  /* AI Tutor chat height adjustment for mobile */
+  .ai-tutor-interface {
+    height: 500px;
+  }
+}

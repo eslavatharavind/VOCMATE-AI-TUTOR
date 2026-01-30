@@ -1,0 +1,190 @@
+/* --- PracticeTopics.css: Premium Glassmorphic Topic Selection --- */
+
+.practice-topics-bg {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  /* Premium radial mesh background ported from dashboard */
+  background: radial-gradient(at 0% 0%, rgba(102, 126, 234, 0.12) 0, transparent 50%),
+    radial-gradient(at 50% 0%, rgba(118, 75, 162, 0.08) 0, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(102, 126, 234, 0.12) 0, transparent 50%),
+    #ffffff;
+  overflow-x: hidden;
+  font-family: 'Inter', system-ui, sans-serif;
+  padding: 120px 5% 60px;
+}
+
+/* Background Blobs for Visual Continuity */
+.topics-blob {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(80px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+.topics-blob-1 {
+  top: -10%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
+}
+
+.topics-blob-2 {
+  bottom: 0%;
+  left: -5%;
+  background: radial-gradient(circle, rgba(168, 85, 247, 0.08) 0%, transparent 70%);
+}
+
+.topics-container {
+  max-width: 800px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 10;
+}
+
+.topics-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.topics-title {
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 900;
+  color: #1e1b4b;
+  letter-spacing: -0.05em;
+  margin-bottom: 0.5rem;
+}
+
+.topics-subtitle {
+  color: #64748b;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+/* Back Button Styling */
+.back-btn-wrapper {
+  position: absolute;
+  top: 40px;
+  left: 5%;
+  z-index: 100;
+}
+
+.premium-back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 10px 20px;
+  border-radius: 14px;
+  color: #4338ca;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  cursor: pointer;
+}
+
+.premium-back-btn:hover {
+  transform: translateX(-5px);
+  background: white;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+}
+
+/* Talk with Tutor - Main Action */
+.tutor-hero-card {
+  background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+  padding: 2.5rem;
+  border-radius: 28px;
+  margin-bottom: 3rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 20px 40px -10px rgba(79, 70, 229, 0.4);
+  transition: transform 0.3s;
+  cursor: pointer;
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.tutor-hero-card:hover {
+  transform: translateY(-8px);
+}
+
+.tutor-hero-content h3 {
+  font-size: 1.75rem;
+  font-weight: 800;
+  margin: 0;
+}
+
+.tutor-hero-content p {
+  opacity: 0.9;
+  font-weight: 500;
+  margin: 0.5rem 0 0;
+}
+
+.tutor-hero-icon {
+  font-size: 3rem;
+  background: rgba(255, 255, 255, 0.2);
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+}
+
+/* Topics Grid */
+.topics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1.25rem;
+}
+
+.topic-btn {
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  padding: 1.25rem;
+  border-radius: 20px;
+  text-align: left;
+  font-weight: 600;
+  color: #334155;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.02);
+}
+
+.topic-btn:hover {
+  background: #ffffff;
+  border-color: #6366f1;
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+  color: #4f46e5;
+}
+
+.topic-arrow {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: all 0.3s;
+}
+
+.topic-btn:hover .topic-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 640px) {
+  .tutor-hero-card {
+    flex-direction: column;
+    text-align: center;
+    gap: 1.5rem;
+  }
+}
