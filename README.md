@@ -1,4 +1,4 @@
-# VocMate31 - AI-Powered Language Tutor
+# VocMate - AI-Powered Language Tutor
 
 VocMate31 is an AI-powered language tutor application designed to help users improve their English speaking, reading, and conversation skills. It features a React-based frontend and a Flask-based backend.
 
