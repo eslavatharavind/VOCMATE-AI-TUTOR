@@ -8,7 +8,7 @@ import Dashboard from "./Dashboard/Dashboard";
 import Verified from "./Verified";
 import { UserProvider } from './context/UserContext'; // ✅ Import the UserProvider
 import PracticeAi from "./Practice Session/PracticeAi";
-import Aravind from "./Practice Session/Aravind";
+
 import ChinnuPractice from "./Practice/ChinnuPractice";
 import PracticeTopics from "./pages/PracticeTopics";
 

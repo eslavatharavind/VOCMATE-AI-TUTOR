@@ -39,6 +39,7 @@ const ReadingPractice = ({ userId }) => {
   const [loading, setLoading] = useState(false);
   // State to store and display any error messages that occur
   const [error, setError] = useState(null);
+  const [activeCategory, setActiveCategory] = useState(null);
 
   // References to DOM elements for manipulation
   const textRef = useRef(null);
@@ -117,6 +118,42 @@ const ReadingPractice = ({ userId }) => {
     }
   };
 
+  const getCategorizedTopics = () => {
+    const categories = {
+      "✈️ Travel & Socializing": [],
+      "💼 Business & Careers": [],
+      "🔬 Science & Technology": [],
+      "🏛️ History & Society": [],
+      "🥗 Health & Wellness": [],
+      "🎨 Arts & Literature": [],
+      "🌍 Nature & Environment": [],
+      "☕ Everyday Life & Hobbies": []
+    };
+
+    topics.forEach(topic => {
+      const id = topic.id;
+      if (['travel', 'ecotourism', 'directions', 'hotel_checkin', 'restaurant_order', 'shopping_conversations', 'daily_conversations', 'work_socializing', 'describing_feelings'].includes(id)) {
+        categories["✈️ Travel & Socializing"].push(topic);
+      } else if (['business', 'presentations', 'job_interview', 'email_writing', 'negotiation', 'future_of_jobs', 'time_management'].includes(id)) {
+        categories["💼 Business & Careers"].push(topic);
+      } else if (['science', 'ai', 'quantum', 'space_colonization', 'renewable_energy', 'climate_change', 'marine_biology', 'genetics', 'cybersecurity', 'internet_history', 'robotics', 'vr', 'nanotechnology', 'big_data', 'self_driving', 'printing_press'].includes(id)) {
+        categories["🔬 Science & Technology"].push(topic);
+      } else if (['history', 'pyramids', 'roman_empire', 'silk_road', 'renaissance', 'industrial_revolution', 'ww2', 'greek_philosophy', 'space_race', 'maya', 'feudal_japan', 'great_wall', 'writing_history', 'vikings', 'printing_press', 'agriculture_origins', 'academic', 'news', 'microeconomics', 'behavioral_psychology', 'anthropology', 'media_sociology', 'political_philosophy', 'urban_planning', 'public_speaking', 'eq', 'sports_history', 'sustainable_architecture', 'learning_psychology'].includes(id)) {
+        categories["🏛️ History & Society"].push(topic);
+      } else if (['health', 'nutrition', 'mental_health', 'yoga', 'sleep_science', 'cardio', 'longevity', 'stress_science', 'gardening', 'walking_benefits', 'hydration', 'first_aid'].includes(id)) {
+        categories["🥗 Health & Wellness"].push(topic);
+      } else if (['music', 'art', 'classical_music', 'modern_art', 'cinema_history', 'architecture_wonders', 'photography', 'mythology', 'theater', 'creative_writing', 'dance_history', 'fashion', 'literature'].includes(id)) {
+        categories["🎨 Arts & Literature"].push(topic);
+      } else if (['national_parks', 'ocean_currents', 'desert_ecosystems', 'rainforest', 'volcanoes', 'glaciers', 'bird_migration', 'solar_system', 'deep_sea', 'microbes', 'space'].includes(id)) {
+        categories["🌍 Nature & Environment"].push(topic);
+      } else {
+        categories["☕ Everyday Life & Hobbies"].push(topic);
+      }
+    });
+
+    return categories;
+  };
+
   // Fetch the actual paragraphs and metadata for a specific topic
   const loadReadingContent = async (topicId) => {
     try {
@@ -133,11 +170,6 @@ const ReadingPractice = ({ userId }) => {
       setReadingTime(0);
       setFeedback(null);
       setShowResults(false);
-
-      // If the content comes with a pre-recorded audio guide, play it
-      if (data.audio_url) {
-        playAudio(data.audio_url);
-      }
     } catch (error) {
       // Display error to user if content fails to load
       console.error('Error loading reading content:', error);
@@ -200,18 +232,6 @@ const ReadingPractice = ({ userId }) => {
     setReadingTime(0);
     setFeedback(null);
     setShowResults(false);
-
-    // Request a TTS audio clip of the current text from the server
-    const currentText = readingContent.paragraphs[currentParagraph];
-    fetch(`${API_URL}/api/reading/paragraph-audio`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: currentText })
-    }).then(res => res.json()).then(data => {
-      if (data.audio_url) {
-        playAudio(data.audio_url);
-      }
-    });
   };
 
   // Advance to the next section of the text
@@ -219,23 +239,10 @@ const ReadingPractice = ({ userId }) => {
     if (!readingContent || currentParagraph >= readingContent.paragraphs.length - 1) return;
 
     setCurrentParagraph(prev => prev + 1);
-    // Reset states for the new paragraph
     setSpokenText('');
     setReadingTime(0);
     setFeedback(null);
     setShowResults(false);
-
-    // Fetch and play TTS audio for the new paragraph to guide the user
-    const nextText = readingContent.paragraphs[currentParagraph + 1];
-    fetch(`${API_URL}/api/reading/paragraph-audio`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: nextText })
-    }).then(res => res.json()).then(data => {
-      if (data.audio_url) {
-        playAudio(data.audio_url);
-      }
-    });
   };
 
   // Start a 100ms interval timer to track reading duration
@@ -289,13 +296,13 @@ const ReadingPractice = ({ userId }) => {
 
     try {
       setLoading(true);
-      const currentText = readingContent.paragraphs[currentParagraph];
+      const fullText = readingContent.paragraphs.join("\n\n");
 
       const response = await fetch(`${API_URL}/api/reading/analyze`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          original_text: currentText,
+          original_text: fullText,
           spoken_text: spokenText,
           reading_time: readingTime,
           user_id: userId,
@@ -500,19 +507,72 @@ const ReadingPractice = ({ userId }) => {
 
       {/* Grid view shown when user needs to select a topic to start */}
       {!selectedTopic && (
-        <div className="topic-selection">
-          <h3>Choose a Reading Topic</h3>
-          <div className="topics-grid">
-            {topics.map((topic) => (
-              <button
-                key={topic.id}
-                onClick={() => setSelectedTopic(topic.id)}
-                className="topic-card"
-              >
-                <h4>{topic.title}</h4>
-                <p>Practice reading with {topic.title.toLowerCase()} content</p>
-              </button>
-            ))}
+        <div className="topic-selection" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3>Choose a Reading Category</h3>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {Object.entries(getCategorizedTopics()).map(([categoryName, categoryTopics]) => {
+              const isExpanded = activeCategory === categoryName;
+              return (
+                <div 
+                  key={categoryName} 
+                  className="lux-card" 
+                  style={{ 
+                    padding: '16px', 
+                    borderRadius: '12px', 
+                    border: '1px solid #e2e8f0', 
+                    cursor: 'pointer', 
+                    transition: 'all 0.2s ease',
+                    background: isExpanded ? '#faf5ff' : 'white'
+                  }}
+                  onClick={() => setActiveCategory(isExpanded ? null : categoryName)}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: '1.08rem', fontWeight: '700', color: '#1e1b4b' }}>
+                      {categoryName}
+                    </span>
+                    <span style={{ fontSize: '0.85rem', fontWeight: '600', color: '#64748b', background: '#f1f5f9', padding: '4px 10px', borderRadius: '20px' }}>
+                      {categoryTopics.length} Topics
+                    </span>
+                  </div>
+
+                  {isExpanded && (
+                    <div 
+                      style={{ 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', 
+                        gap: '12px', 
+                        marginTop: '16px',
+                        animation: 'fadeIn 0.25s ease'
+                      }}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      {categoryTopics.map((topic) => (
+                        <button
+                          key={topic.id}
+                          onClick={() => setSelectedTopic(topic.id)}
+                          className="lux-button"
+                          style={{
+                            padding: '14px',
+                            textAlign: 'left',
+                            fontSize: '0.92rem',
+                            fontWeight: '600',
+                            borderRadius: '10px',
+                            background: '#ffffff',
+                            border: '1px solid #e2e8f0',
+                            color: '#1e1b4b',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.02)',
+                            transition: 'all 0.2s ease'
+                          }}
+                        >
+                          📖 {topic.title}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       )}
@@ -540,12 +600,16 @@ const ReadingPractice = ({ userId }) => {
                 ref={textRef}
                 className="text-display"
                 style={{
-                  height: '150px',
+                  height: '300px',
                   overflowY: 'auto'
                 }}
               >
-                <div className="paragraph-content">
-                  {readingContent.paragraphs[currentParagraph]}
+                <div className="paragraph-content" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  {readingContent.paragraphs.map((para, idx) => (
+                    <p key={idx} style={{ margin: 0, lineHeight: '1.6', fontSize: '1.05rem', color: '#1e1b4b', textAlign: 'left' }}>
+                      {para}
+                    </p>
+                  ))}
                 </div>
               </div>
             </div>
@@ -575,16 +639,9 @@ const ReadingPractice = ({ userId }) => {
                   </>
                 )}
 
-                {/* Reset or navigate paragraphs */}
                 <button onClick={repeatParagraph} className="repeat-btn">
                   🔄 Restart
                 </button>
-
-                {currentParagraph < readingContent.paragraphs.length - 1 && (
-                  <button onClick={nextParagraph} className="next-btn">
-                    ⏭️ Next Section
-                  </button>
-                )}
               </div>
 
               {/* Live Mic Animation when audio data is successfully streaming to Deepgram */}
@@ -601,27 +658,45 @@ const ReadingPractice = ({ userId }) => {
                 </div>
               )}
 
-              {/* One-click TTS audio play back for pronunciation help */}
+              {/* One-click TTS audio play back for pronunciation help - Toggles playback on/off */}
               <button
                 onClick={async () => {
-                  const res = await fetch(`${API_URL}/api/ai-tutor/text-to-speech`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: readingContent.paragraphs[currentParagraph] })
-                  });
-                  const data = await res.json();
-                  if (data.audio_url) playAudio(data.audio_url);
+                  if (currentAudio) {
+                    currentAudio.pause();
+                    setCurrentAudio(null);
+                    return;
+                  }
+                  
+                  try {
+                    const fullText = readingContent.paragraphs.join(" ");
+                    const res = await fetch(`${API_URL}/api/ai-tutor/text-to-speech`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ text: fullText })
+                    });
+                    const data = await res.json();
+                    if (data.audio_url) {
+                      const audio = new Audio(data.audio_url);
+                      audio.onended = () => setCurrentAudio(null);
+                      audio.play();
+                      setCurrentAudio(audio);
+                    }
+                  } catch (error) {
+                    console.error('Error playing dynamic TTS guide:', error);
+                  }
                 }}
                 className="tts-btn"
+                style={{
+                  background: currentAudio ? '#ef4444' : '#f1f5f9',
+                  color: currentAudio ? 'white' : '#4f46e5',
+                  fontWeight: '600'
+                }}
               >
-                🔊 AI Pronunciation Guide
+                {currentAudio ? '🛑 Stop AI Voice' : '🔊 AI Pronunciation Guide'}
               </button>
 
               {/* Real-time statistics about the reading session */}
               <div className="reading-stats">
-                <div className="stat">
-                  <span>Part: {currentParagraph + 1} / {readingContent.paragraphs.length}</span>
-                </div>
                 <div className="stat">
                   <span>Time: {formatTime(readingTime)}</span>
                 </div>

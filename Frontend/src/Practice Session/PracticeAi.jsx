@@ -438,7 +438,7 @@ function VocMateTutor() {
   };
 
   const finalExit = () => {
-    navigate('/dashboard');
+    navigate('/dashboard', { state: { showAnalytics: true } });
   };
 
   const handleBackToTopics = () => {
@@ -449,7 +449,7 @@ function VocMateTutor() {
     navigate('/practice-topics');
   };
 
-  const handleBackToDashboard = () => navigate('/dashboard');
+  const handleBackToDashboard = () => navigate('/dashboard', { state: { showAnalytics: true } });
 
   useEffect(() => {
     if (videoRef.current && stream) videoRef.current.srcObject = stream;
