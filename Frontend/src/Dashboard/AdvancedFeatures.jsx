@@ -6,9 +6,12 @@ import ReadingPractice from './ReadingPractice';
 import './AdvancedFeatures.css';
 
 // Define the AdvancedFeatures component which takes userId and onBack as props
-const AdvancedFeatures = ({ userId, onBack, initialTab }) => {
+const AdvancedFeatures = (props) => {
+  const { userId, onBack, initialTab } = props;
   // State to track the currently active feature tab (null means showing the menu)
-  const [activeTab, setActiveTab] = useState(initialTab || null);
+  const [localActiveTab, setLocalActiveTab] = useState(initialTab || null);
+  const activeTab = props.activeTab !== undefined ? props.activeTab : localActiveTab;
+  const setActiveTab = props.setActiveTab !== undefined ? props.setActiveTab : setLocalActiveTab;
 
   // Sync active tab if initialTab prop changes
   useEffect(() => {

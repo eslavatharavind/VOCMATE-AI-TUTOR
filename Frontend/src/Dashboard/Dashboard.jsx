@@ -17,16 +17,23 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const { voiceId, setvoiceId } = useUser();
-  const [showAdvancedFeatures, setShowAdvancedFeatures] = useState(false);
   const [userId, setUserId] = useState('user123');
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [navOpen, setNavOpen] = useState(false);
   const [navTarget, setNavTarget] = useState(null);
+  const [activeFeatureTab, setActiveFeatureTab] = useState(null);
+
+  const advancedRef = useRef(null);
 
   // Handle auto-opening analytics from practice session exit
   useEffect(() => {
     if (location.state?.showAnalytics) {
-      setShowAdvancedFeatures(true);
+      setActiveFeatureTab('progress');
+      setTimeout(() => {
+        if (advancedRef.current) {
+          advancedRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 200);
       // Clear navigation state so a reload doesn't reopen analytics
       navigate(location.pathname, { replace: true, state: {} });
     }
@@ -103,18 +110,6 @@ export default function Dashboard() {
     return () => clearTimeout(timeout);
   }, [charIndex, isDeleting, typingIndex, typingTexts]);
 
-  // Handle navigation after closing Advanced Features
-  useEffect(() => {
-    if (!showAdvancedFeatures && navTarget) {
-      if (navTarget === 'intro' && introRef.current) {
-        introRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (navTarget === 'avatars' && avatarRef.current) {
-        avatarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-      setNavTarget(null);
-    }
-  }, [showAdvancedFeatures, navTarget]);
-
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     localStorage.removeItem("user");
@@ -139,7 +134,7 @@ export default function Dashboard() {
     navigate('/practice-topics');
   };
 
-  // Navigation bar actions
+  // Navigation bar actions - Smooth scroll and lift tab states
   const handleNav = (section) => {
     setNavOpen(false);
 
@@ -148,21 +143,40 @@ export default function Dashboard() {
       return;
     }
 
-    if (section === 'advanced') {
-      setShowAdvancedFeatures((prev) => !prev);
+    if (section === 'home' || section === 'dashboard') {
+      if (introRef.current) {
+        introRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       return;
     }
 
-    if (showAdvancedFeatures) {
-      setNavTarget(section);
-      setShowAdvancedFeatures(false);
-    } else {
-      if (section === 'intro' && introRef.current) {
-        introRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      } else if (section === 'avatars' && avatarRef.current) {
+    if (section === 'avatars') {
+      if (avatarRef.current) {
         avatarRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
+      return;
     }
+
+    if (section === 'settings') {
+      alert("Settings coming soon!");
+      return;
+    }
+
+    // It's an advanced feature section link
+    let tab = null;
+    if (section === 'reading') tab = 'reading';
+    else if (section === 'shadowing') tab = 'shadowing';
+    else if (section === 'simulator') tab = 'conversation';
+    else if (section === 'challenge') tab = 'challenge';
+    else if (section === 'advanced') tab = null;
+
+    setActiveFeatureTab(tab);
+
+    setTimeout(() => {
+      if (advancedRef.current) {
+        advancedRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 150);
   };
 
   return (
@@ -184,17 +198,41 @@ export default function Dashboard() {
             <button className="nav-toggle-btn close" onClick={() => setNavOpen(false)} title="Close Menu">
               <span role="img" aria-label="Close">✕</span>
             </button>
-            <button className="nav-btn" onClick={() => handleNav('intro')} title="Intro">
-              <span role="img" aria-label="Intro">🏠</span>
-              <span className="nav-label">Intro</span>
+            <button className="nav-btn" onClick={() => handleNav('home')} title="Home">
+              <span role="img" aria-label="Home">🏠</span>
+              <span className="nav-label">Home</span>
+            </button>
+            <button className="nav-btn" onClick={() => handleNav('dashboard')} title="Dashboard">
+              <span role="img" aria-label="Dashboard">📊</span>
+              <span className="nav-label">Dashboard</span>
+            </button>
+            <button className="nav-btn" onClick={() => handleNav('reading')} title="Reading">
+              <span role="img" aria-label="Reading">📖</span>
+              <span className="nav-label">Reading</span>
+            </button>
+            <button className="nav-btn" onClick={() => handleNav('shadowing')} title="Shadowing">
+              <span role="img" aria-label="Shadowing">🎤</span>
+              <span className="nav-label">Shadowing</span>
+            </button>
+            <button className="nav-btn" onClick={() => handleNav('simulator')} title="Simulator">
+              <span role="img" aria-label="Simulator">💬</span>
+              <span className="nav-label">Simulator</span>
+            </button>
+            <button className="nav-btn" onClick={() => handleNav('challenge')} title="Challenge">
+              <span role="img" aria-label="Challenge">🏆</span>
+              <span className="nav-label">Challenge</span>
+            </button>
+            <button className="nav-btn" onClick={() => handleNav('advanced')} title="Advanced Features">
+              <span role="img" aria-label="Advanced">🤖</span>
+              <span className="nav-label">Advanced Features</span>
             </button>
             <button className="nav-btn" onClick={() => handleNav('avatars')} title="Avatars">
-              <span role="img" aria-label="Avatars">🧑‍🤝‍🧑</span>
+              <span role="img" aria-label="Avatars">👥</span>
               <span className="nav-label">Avatars</span>
             </button>
-            <button className="nav-btn" onClick={() => handleNav('advanced')} title="Show Advanced Features">
-              <span role="img" aria-label="Advanced">✨</span>
-              <span className="nav-label">Advanced</span>
+            <button className="nav-btn" onClick={() => handleNav('settings')} title="Settings">
+              <span role="img" aria-label="Settings">⚙️</span>
+              <span className="nav-label">Settings</span>
             </button>
             <button className="nav-btn" onClick={() => handleNav('signout')} title="Sign Out">
               <span role="img" aria-label="Sign Out">🚪</span>
@@ -228,63 +266,71 @@ export default function Dashboard() {
       </div>
 
       <div className="dashboard-content">
-        {showAdvancedFeatures ? (
-          <AdvancedFeatures userId={userId} onBack={() => setShowAdvancedFeatures(false)} initialTab={location.state?.showAnalytics ? 'progress' : null} />
-        ) : (
-          <>
-            <div className="welcome-section" ref={introRef}>
-              <h2>VOCMATE AI Tutor</h2>
-              <p>Practice English with your personal AI tutor. Improve your speaking, pronunciation, fluency, and confidence through real-time AI conversations.</p>
-              <button
-                className="start-speaking-btn"
-                onClick={() => avatarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-              >
-                Start Speaking
-              </button>
-            </div>
+        <div className="welcome-section" ref={introRef}>
+          <h2>VOCMATE AI Tutor</h2>
+          <p>Practice English with your personal AI tutor. Improve your speaking, pronunciation, fluency, and confidence through real-time AI conversations.</p>
+          <button
+            className="start-speaking-btn"
+            onClick={() => avatarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+          >
+            Start Speaking
+          </button>
+        </div>
 
-            <div className="animated-avatar-carousel-section" ref={avatarRef}>
-              <h3>CHOOSE YOUR AVATAR</h3>
-              <div className="animated-avatar-carousel-wrapper">
-                <button className="carousel-arrow" onClick={handlePrev}>&lt;</button>
-                <div className="animated-avatar-carousel">
-                  {/* Left Avatar */}
-                  <div className="carousel-avatar left">
-                    <img
-                      src={`/avatars/${visibleAvatars[0].img}`}
-                      alt={visibleAvatars[0].label}
-                      className="avatar-image"
-                      draggable={false}
-                    />
-                    <div className="avatar-label">{visibleAvatars[0].label}</div>
-                  </div>
-                  {/* Center Avatar */}
-                  <div className="carousel-avatar center" onClick={handleCenterAvatarClick} title="Go to Practice">
-                    <img
-                      src={`/avatars/${visibleAvatars[1].img}`}
-                      alt={visibleAvatars[1].label}
-                      className="avatar-image"
-                      draggable={false}
-                    />
-                    <div className="avatar-label">{visibleAvatars[1].label}</div>
-                  </div>
-                  {/* Right Avatar */}
-                  <div className="carousel-avatar right">
-                    <img
-                      src={`/avatars/${visibleAvatars[2].img}`}
-                      alt={visibleAvatars[2].label}
-                      className="avatar-image"
-                      draggable={false}
-                    />
-                    <div className="avatar-label">{visibleAvatars[2].label}</div>
-                  </div>
-                </div>
-                <button className="carousel-arrow" onClick={handleNext}>&gt;</button>
+        <div className="animated-avatar-carousel-section" ref={avatarRef}>
+          <h3>CHOOSE YOUR AVATAR</h3>
+          <div className="animated-avatar-carousel-wrapper">
+            <button className="carousel-arrow" onClick={handlePrev}>&lt;</button>
+            <div className="animated-avatar-carousel">
+              {/* Left Avatar */}
+              <div className="carousel-avatar left">
+                <img
+                  src={`/avatars/${visibleAvatars[0].img}`}
+                  alt={visibleAvatars[0].label}
+                  className="avatar-image"
+                  draggable={false}
+                />
+                <div className="avatar-label">{visibleAvatars[0].label}</div>
+              </div>
+              {/* Center Avatar */}
+              <div className="carousel-avatar center" onClick={handleCenterAvatarClick} title="Go to Practice">
+                <img
+                  src={`/avatars/${visibleAvatars[1].img}`}
+                  alt={visibleAvatars[1].label}
+                  className="avatar-image"
+                  draggable={false}
+                />
+                <div className="avatar-label">{visibleAvatars[1].label}</div>
+              </div>
+              {/* Right Avatar */}
+              <div className="carousel-avatar right">
+                <img
+                  src={`/avatars/${visibleAvatars[2].img}`}
+                  alt={visibleAvatars[2].label}
+                  className="avatar-image"
+                  draggable={false}
+                />
+                <div className="avatar-label">{visibleAvatars[2].label}</div>
               </div>
             </div>
+            <button className="carousel-arrow" onClick={handleNext}>&gt;</button>
+          </div>
+        </div>
 
-          </>
-        )}
+        <div className="dashboard-advanced-features-section" ref={advancedRef} style={{ width: '100%' }}>
+          <AdvancedFeatures
+            userId={userId}
+            isEmbedded={true}
+            activeTab={activeFeatureTab}
+            setActiveTab={setActiveFeatureTab}
+            onBack={() => {
+              setActiveFeatureTab(null);
+              if (introRef.current) {
+                introRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );
