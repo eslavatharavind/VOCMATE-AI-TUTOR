@@ -96,53 +96,38 @@
   display: flex;
   justify-content: space-between;
   width: 100%;
+  gap: 12px;
 }
 
-/* Shared styles for primary navigation buttons */
+/* Shared styles for primary navigation buttons - Clean white design */
 .main-back-btn,
 .menu-back-btn {
-  /* Use a vibrant blue-to-indigo gradient with high contrast */
-  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  /* White text for contrast */
-  color: white;
-  /* Remove default button borders */
-  border: none;
-  /* Generous padding for a clickable target */
-  padding: 14px 28px;
-  /* Large rounded corners for a modern feel */
-  border-radius: 18px;
-  /* Use bold weight for readability */
+  background: white !important;
+  color: #4f46e5 !important;
+  border: 1px solid rgba(79, 70, 229, 0.25) !important;
+  padding: 8px 16px !important;
+  border-radius: 12px !important;
   font-weight: 600;
-  /* Pointer cursor to indicate interactivity */
   cursor: pointer;
-  /* Sophisticated cubic-bezier transition */
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  /* Apply a layered shadow for depth */
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 20px 25px -5px rgba(79, 70, 229, 0.1);
-  /* Use flexbox to align icon and text */
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   display: flex;
   align-items: center;
   gap: 10px;
-  /* Add font size for prominence */
-  font-size: 1rem;
-  letter-spacing: -0.01em;
-}
-
-/* Secondary style for the menu-back button to distinguish it */
-.menu-back-btn {
-  /* Use a softer purple-to-blue gradient */
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  font-size: 0.9rem !important;
+  height: 40px !important;
+  justify-content: center;
+  flex: 1;
 }
 
 /* Hover state for navigation buttons */
 .main-back-btn:hover,
 .menu-back-btn:hover {
-  /* Slight lift and scale effect */
-  transform: translateY(-3px) scale(1.02);
-  /* Intenisfy shadow on hover */
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 25px 30px -5px rgba(79, 70, 229, 0.2);
-  /* Lightness increase */
-  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.15);
+  background: #f5f3ff !important;
+  border-color: #4f46e5 !important;
+  filter: none !important;
 }
 
 /* Container for the horizontal tab buttons with ultra-glassmorphism */
@@ -920,5 +905,76 @@
   .challenge-container button {
     width: 100% !important;
     max-width: 100% !important;
+  }
+
+  /* Speaking Challenge Leave Button Fixes */
+  .daily-challenge .lux-card,
+  .daily-challenge .challenge-content {
+    position: relative !important;
+    padding-top: 54px !important;
+  }
+
+  .daily-challenge .lux-card > div:first-child {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    width: 100% !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+  }
+
+  .daily-challenge .lux-card > div:first-child button {
+    position: absolute !important;
+    top: 14px !important;
+    right: 14px !important;
+    margin: 0 !important;
+    padding: 6px 12px !important;
+    font-size: 0.8rem !important;
+    border-radius: 8px !important;
+    height: 32px !important;
+    width: auto !important;
+    line-height: 1 !important;
+  }
+
+  /* Centered Challenge Evaluation Report Popup */
+  .challenge-report {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 92% !important;
+    max-width: 480px !important;
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    z-index: 10001 !important;
+    background: #0f0c24 !important;
+    border: 1px solid rgba(99, 102, 241, 0.25) !important;
+    border-radius: 24px !important;
+    padding: 20px !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  /* Add dynamic blur backdrop when report is open */
+  .challenge-report::before {
+    content: "" !important;
+    position: fixed !important;
+    top: -50vh !important;
+    left: -50vw !important;
+    width: 200vw !important;
+    height: 200vh !important;
+    background: rgba(10, 8, 19, 0.75) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+  }
+  
+  .challenge-report h4 {
+    font-size: 1.1rem !important;
   }
 }

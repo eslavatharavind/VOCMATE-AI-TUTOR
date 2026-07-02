@@ -439,24 +439,42 @@
 @media (max-width: 768px) {
     /* Header toolbar */
     .session-header {
-        padding: 10px 16px;
-        box-sizing: border-box;
+        display: flex !important;
+        flex-direction: row !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        padding: 8px 10px !important;
+        height: 54px !important;
+        box-sizing: border-box !important;
+        gap: 8px !important;
     }
     
     .vocmate_session_head {
-        font-size: 1.1rem;
+        font-size: 0.95rem !important;
+        text-align: center !important;
+        flex: 1 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        margin: 0 !important;
     }
 
     .session-back-btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-        border-radius: 8px;
+        padding: 4px 8px !important;
+        font-size: 0.72rem !important;
+        border-radius: 6px !important;
+        height: 32px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
     }
     
     .end_session {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-        border-radius: 8px;
+        padding: 4px 8px !important;
+        font-size: 0.72rem !important;
+        border-radius: 6px !important;
+        height: 32px !important;
+        white-space: nowrap !important;
+        flex-shrink: 0 !important;
     }
 
     /* Layout stack */
