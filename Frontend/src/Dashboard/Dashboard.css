@@ -359,7 +359,16 @@ body {
 .header-left {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 14px;
+}
+
+/* Brand logo replacing old robot SVG */
+.brand-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.4));
+  flex-shrink: 0;
 }
 
 .header-text-column {
@@ -672,19 +681,18 @@ body {
     height: 32px;
   }
 
+  /* Brand logo mobile size */
+  .brand-logo {
+    width: 44px;
+    height: 44px;
+  }
+
   .dashboard-header h1 {
-    font-size: 1.15rem;
-    white-space: nowrap;
-    overflow: hidden;
-    text-shadow: none;
-    text-overflow: ellipsis;
+    display: none;
   }
 
   .dashboard-intro-typing {
-    font-size: 0.8rem;
-    min-height: auto;
-    letter-spacing: 0.5px;
-    margin-top: 1px;
+    font-size: 0.9rem;
   }
 
   .typing-text {
@@ -1332,9 +1340,9 @@ body {
 
 .dashboard-nav-horizontal {
   position: fixed;
-  top: 24px;
-  right: 36px;
-  z-index: 200;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
   display: flex;
   flex-direction: row;
   align-items: center;

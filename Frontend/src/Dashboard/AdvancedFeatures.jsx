@@ -1292,68 +1292,89 @@ const AdvancedFeatures = (props) => {
       <div className="bg-blob-1"></div>
       <div className="bg-blob-2"></div>
 
-      {/* Top Header Section with Navigation Buttons */}
-      <div className="features-nav-header">
-        <div className="top-nav-buttons">
-          <button className="main-back-btn" onClick={onBack} title="Back to Dashboard">
-            <span className="icon">🏠</span> Main Dashboard
-          </button>
-
-          {activeTab && (
-            <button className="menu-back-btn" onClick={() => setActiveTab(null)} title="Back to Features Menu">
-              <span className="icon">🔙</span> Features Menu
+          {/* Back to Features Menu button - Rendered inline when a specific practice screen is open */}
+      {activeTab && activeTab !== 'progress' && (
+        <div className="features-nav-header" style={{ marginBottom: '24px' }}>
+          <div className="top-nav-buttons" style={{ justifyContent: 'flex-start' }}>
+            <button className="menu-back-btn" onClick={() => setActiveTab(null)} title="Back to Features Menu" style={{ width: 'auto', flex: 'none' }}>
+              <span className="icon">🔙</span> Back to Features Menu
             </button>
-          )}
+          </div>
         </div>
-
-        {/* Feature Tab Navigation List with ultra-glassmorphism styling */}
-        <div className="features-tabs">
-          <button className={activeTab === 'progress' ? 'active' : ''} onClick={() => setActiveTab('progress')}>
-            Progress
-          </button>
-          <button className={activeTab === 'reading' ? 'active' : ''} onClick={() => setActiveTab('reading')}>
-            Reading
-          </button>
-          <button className={activeTab === 'shadowing' ? 'active' : ''} onClick={() => setActiveTab('shadowing')}>
-            Shadowing
-          </button>
-          <button className={activeTab === 'conversation' ? 'active' : ''} onClick={() => setActiveTab('conversation')}>
-            Simulator
-          </button>
-          <button className={activeTab === 'challenge' ? 'active' : ''} onClick={() => setActiveTab('challenge')}>
-            Challenge
-          </button>
-        </div>
-      </div>
+      )}
 
       <div className="feature-content">
         {/* Main Dashboard Menu Overlay */}
         {!activeTab && (
-          <div className="features-menu-grid">
-            <div className="menu-card" onClick={() => setActiveTab('progress')}>
-              <div className="menu-card-icon">📊</div>
-              <h4>Progress Tracker</h4>
-              <p>Monitor your learning journey and achievements</p>
-            </div>
-            <div className="menu-card" onClick={() => setActiveTab('reading')}>
-              <div className="menu-card-icon">📖</div>
-              <h4>Reading Practice</h4>
-              <p>Improve your reading fluency with AI feedback</p>
-            </div>
-            <div className="menu-card" onClick={() => setActiveTab('shadowing')}>
-              <div className="menu-card-icon">🗣️</div>
-              <h4>Shadowing Mode</h4>
-              <p>Perfect your accent by repeating after AI</p>
-            </div>
-            <div className="menu-card" onClick={() => setActiveTab('conversation')}>
-              <div className="menu-card-icon">💬</div>
-              <h4>Conversation Simulator</h4>
-              <p>Practice real-world scenarios with AI</p>
-            </div>
-            <div className="menu-card" onClick={() => setActiveTab('challenge')}>
-              <div className="menu-card-icon">🎯</div>
-              <h4>Daily Challenge</h4>
-              <p>Complete your daily speaking goal</p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
+            <h2 className="section-title" style={{ margin: '0 0 20px 0', fontSize: '2rem', color: '#1e1b4b', fontWeight: '800', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              ✨ Advanced Features
+            </h2>
+            
+            <div className="features-menu-grid">
+              {/* 1. AI Speaking Coach */}
+              <div className="menu-card" onClick={() => navigate('/practice-topics')}>
+                <div className="menu-card-icon">🎤</div>
+                <h4>AI Speaking Coach</h4>
+                <p>Practice real-time AI conversations.</p>
+                <button className="start-btn">Start →</button>
+              </div>
+
+              {/* 2. Reading Practice */}
+              <div className="menu-card" onClick={() => setActiveTab('reading')}>
+                <div className="menu-card-icon">📖</div>
+                <h4>Reading Practice</h4>
+                <p>Improve pronunciation and reading skills.</p>
+                <button className="start-btn">Start →</button>
+              </div>
+
+              {/* 3. Shadowing Practice */}
+              <div className="menu-card" onClick={() => setActiveTab('shadowing')}>
+                <div className="menu-card-icon">🎧</div>
+                <h4>Shadowing Practice</h4>
+                <p>Speak along with native speakers.</p>
+                <button className="start-btn">Start →</button>
+              </div>
+
+              {/* 4. Scenario Simulator */}
+              <div className="menu-card" onClick={() => setActiveTab('conversation')}>
+                <div className="menu-card-icon">💬</div>
+                <h4>Scenario Simulator</h4>
+                <p>Practice real-life conversations.</p>
+                <button className="start-btn">Start →</button>
+              </div>
+
+              {/* 5. Daily Speaking Challenge */}
+              <div className="menu-card" onClick={() => setActiveTab('challenge')}>
+                <div className="menu-card-icon">🏆</div>
+                <h4>Daily Speaking Challenge</h4>
+                <p>Complete daily speaking challenges.</p>
+                <button className="start-btn">Start →</button>
+              </div>
+
+              {/* 6. Vocabulary Builder */}
+              <div className="menu-card" onClick={() => setActiveTab('vocabulary')}>
+                <div className="menu-card-icon">📚</div>
+                <h4>Vocabulary Builder</h4>
+                <p>Learn new words every day.</p>
+                <button className="start-btn">Start →</button>
+              </div>
+
+              {/* 7. Grammar Practice */}
+              <div className="menu-card" onClick={() => setActiveTab('grammar')}>
+                <div className="menu-card-icon">✍️</div>
+                <h4>Grammar Practice</h4>
+                <p>Improve grammar with AI feedback.</p>
+                <button className="start-btn">Start →</button>
+              </div>
+
+              {/* 8. Pronunciation Coach */}
+              <div className="menu-card" onClick={() => setActiveTab('pronunciation')}>
+                <div className="menu-card-icon">🎯</div>
+                <h4>Pronunciation Coach</h4>
+                <p>Practice difficult words and sounds.</p>
+                <button className="start-btn">Start →</button>
+              </div>
             </div>
           </div>
         )}
@@ -1367,9 +1388,9 @@ const AdvancedFeatures = (props) => {
           </div>
         )}
 
-        {/* Progress Tracker Module */}
-        {activeTab === 'progress' && (
-          <div className="feature-container progress-dashboard" style={{ animation: 'fadeIn 0.3s ease' }}>
+        {/* Progress Tracker (Analytics) Module */}
+        {(activeTab === 'progress' || !activeTab) && (
+          <div className="feature-container progress-dashboard" style={{ animation: 'fadeIn 0.3s ease', marginTop: !activeTab ? '60px' : '0', borderTop: !activeTab ? '1px solid rgba(255,255,255,0.05)' : 'none', paddingTop: !activeTab ? '40px' : '0' }}>
             
             {/* Confetti Celebration Element */}
             {showConfetti && (
@@ -1402,9 +1423,11 @@ const AdvancedFeatures = (props) => {
               </div>
             )}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-              <h3 style={{ margin: 0 }}>📊 Performance Dashboard</h3>
-              <button onClick={loadProgressData} className="lux-button lux-button-secondary" style={{ padding: '8px 16px', fontSize: '0.88rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
+              <h2 id="dashboard-analytics-heading" className="section-title" style={{ margin: 0, fontSize: '2rem', color: '#1e1b4b', fontWeight: '800', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
+                📊 Analytics
+              </h2>
+              <button onClick={loadProgressData} className="lux-button lux-button-secondary" style={{ padding: '8px 16px', fontSize: '0.88rem', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 🔄 Refresh Stats
               </button>
             </div>
@@ -2705,9 +2728,163 @@ const AdvancedFeatures = (props) => {
             )}
           </div>
         )}
+
+        {/* ========== Vocabulary Builder Module ========== */}
+        {activeTab === 'vocabulary' && (
+          <div className="feature-container" style={{ animation: 'fadeIn 0.4s ease' }}>
+            <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <span style={{ fontSize: '3rem' }}>📚</span>
+                <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#1e1b4b' }}>Vocabulary Builder</h3>
+                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Learn new words every day with AI-powered lessons</p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                {[
+                  { icon: '📖', title: 'Word of the Day', desc: 'New word with meaning & examples' },
+                  { icon: '🔤', title: 'Synonyms & Antonyms', desc: 'Expand your word network' },
+                  { icon: '🎤', title: 'Pronunciation', desc: 'Hear and practice word sounds' },
+                  { icon: '📝', title: 'Example Sentences', desc: 'See words used in context' },
+                  { icon: '⭐', title: 'Favourite Words', desc: 'Save and review later' },
+                  { icon: '🧠', title: 'AI Vocabulary Quiz', desc: 'Test your word knowledge' },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    background: 'rgba(99, 102, 241, 0.06)',
+                    border: '1px solid rgba(99, 102, 241, 0.12)',
+                    borderRadius: '14px',
+                    padding: '16px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontWeight: '700', color: '#1e1b4b', fontSize: '0.92rem' }}>{item.title}</div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ background: 'linear-gradient(135deg, #ede9fe, #e0e7ff)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
+                <h4 style={{ margin: '0 0 8px', color: '#4338ca', fontWeight: '700' }}>🌟 Today's Word: "Eloquent"</h4>
+                <p style={{ color: '#6366f1', fontSize: '0.9rem', margin: '0 0 4px' }}><strong>Meaning:</strong> Fluent or persuasive in speaking or writing</p>
+                <p style={{ color: '#6366f1', fontSize: '0.9rem', margin: '0 0 12px', fontStyle: 'italic' }}>"She gave an eloquent speech about climate change."</p>
+                <button className="lux-button" style={{ padding: '10px 28px', fontSize: '0.95rem' }}>
+                  Start Practice →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========== Grammar Practice Module ========== */}
+        {activeTab === 'grammar' && (
+          <div className="feature-container" style={{ animation: 'fadeIn 0.4s ease' }}>
+            <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <span style={{ fontSize: '3rem' }}>✍️</span>
+                <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#1e1b4b' }}>Grammar Practice</h3>
+                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Master English grammar with AI-powered corrections</p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                {[
+                  { icon: '✏️', title: 'Sentence Correction', desc: 'Fix grammar errors in sentences' },
+                  { icon: '⏰', title: 'Tenses Practice', desc: 'Master all 12 English tenses' },
+                  { icon: '📌', title: 'Articles & Prepositions', desc: 'A, an, the, in, on, at...' },
+                  { icon: '🔄', title: 'Voice Correction', desc: 'Active & passive voice' },
+                  { icon: '🤖', title: 'AI Explanations', desc: 'Understand why it\'s wrong' },
+                  { icon: '📝', title: 'Writing Practice', desc: 'Write and get AI feedback' },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    background: 'rgba(16, 185, 129, 0.06)',
+                    border: '1px solid rgba(16, 185, 129, 0.12)',
+                    borderRadius: '14px',
+                    padding: '16px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontWeight: '700', color: '#1e1b4b', fontSize: '0.92rem' }}>{item.title}</div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ background: 'linear-gradient(135deg, #d1fae5, #ecfdf5)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
+                <h4 style={{ margin: '0 0 10px', color: '#065f46', fontWeight: '700' }}>🧪 Quick Grammar Quiz</h4>
+                <p style={{ color: '#047857', fontSize: '0.9rem', margin: '0 0 6px' }}>Fix this sentence:</p>
+                <p style={{ color: '#1e1b4b', fontSize: '1rem', fontWeight: '600', fontStyle: 'italic', margin: '0 0 14px' }}>"She don't likes to swimming."</p>
+                <button className="lux-button" style={{ padding: '10px 28px', fontSize: '0.95rem' }}>
+                  Start Practice →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ========== Pronunciation Coach Module ========== */}
+        {activeTab === 'pronunciation' && (
+          <div className="feature-container" style={{ animation: 'fadeIn 0.4s ease' }}>
+            <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
+              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                <span style={{ fontSize: '3rem' }}>🎯</span>
+                <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#1e1b4b' }}>Pronunciation Coach</h3>
+                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Perfect your pronunciation with AI analysis</p>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                {[
+                  { icon: '🎙️', title: 'Record Voice', desc: 'Record and analyze your speech' },
+                  { icon: '📊', title: 'Pronunciation Score', desc: 'Get accuracy percentage' },
+                  { icon: '🌍', title: 'Accent Feedback', desc: 'Improve your accent clarity' },
+                  { icon: '💪', title: 'Difficult Words', desc: 'Practice challenging words' },
+                  { icon: '🏆', title: 'Fluency Score', desc: 'Track your speaking flow' },
+                  { icon: '💡', title: 'AI Tips & Corrections', desc: 'Personalized speaking tips' },
+                ].map((item, i) => (
+                  <div key={i} style={{
+                    background: 'rgba(245, 158, 11, 0.06)',
+                    border: '1px solid rgba(245, 158, 11, 0.12)',
+                    borderRadius: '14px',
+                    padding: '16px',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '12px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}>
+                    <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
+                    <div>
+                      <div style={{ fontWeight: '700', color: '#1e1b4b', fontSize: '0.92rem' }}>{item.title}</div>
+                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ background: 'linear-gradient(135deg, #fef3c7, #fffbeb)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
+                <h4 style={{ margin: '0 0 10px', color: '#92400e', fontWeight: '700' }}>🎤 Try Saying This Word</h4>
+                <p style={{ color: '#1e1b4b', fontSize: '1.8rem', fontWeight: '800', margin: '0 0 6px', letterSpacing: '2px' }}>Entrepreneurship</p>
+                <p style={{ color: '#b45309', fontSize: '0.85rem', margin: '0 0 14px' }}>/ˌɒn.trə.prəˈnɜː.ʃɪp/</p>
+                <button className="lux-button" style={{ padding: '10px 28px', fontSize: '0.95rem' }}>
+                  Start Practice →
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   );
 };
 
-export default AdvancedFeatures; 
+export default AdvancedFeatures;

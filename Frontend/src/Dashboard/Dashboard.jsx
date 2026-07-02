@@ -143,7 +143,7 @@ export default function Dashboard() {
       return;
     }
 
-    if (section === 'home' || section === 'dashboard') {
+    if (section === 'intro') {
       if (introRef.current) {
         introRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -157,26 +157,32 @@ export default function Dashboard() {
       return;
     }
 
-    if (section === 'settings') {
-      alert("Settings coming soon!");
+    if (section === 'advanced') {
+      setActiveFeatureTab(null);
+      setTimeout(() => {
+        if (advancedRef.current) {
+          advancedRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
       return;
     }
 
-    // It's an advanced feature section link
-    let tab = null;
-    if (section === 'reading') tab = 'reading';
-    else if (section === 'shadowing') tab = 'shadowing';
-    else if (section === 'simulator') tab = 'conversation';
-    else if (section === 'challenge') tab = 'challenge';
-    else if (section === 'advanced') tab = null;
-
-    setActiveFeatureTab(tab);
-
-    setTimeout(() => {
-      if (advancedRef.current) {
-        advancedRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    }, 150);
+    if (section === 'analytics') {
+      // In embedded mode, the analytics (progress) is displayed inline below Advanced Features
+      // We set activeFeatureTab to 'progress' or null depending on grid visibility, but wait:
+      // The prompt says "Rename Progress to Analytics. Place it below the Advanced Features section."
+      // So if active tab is null, both are shown. Let's make sure active tab is null (or 'progress') and scroll to it.
+      setActiveFeatureTab('progress');
+      setTimeout(() => {
+        const analyticsEl = document.getElementById('dashboard-analytics-heading');
+        if (analyticsEl) {
+          analyticsEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else if (advancedRef.current) {
+          advancedRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 150);
+      return;
+    }
   };
 
   return (
@@ -198,41 +204,21 @@ export default function Dashboard() {
             <button className="nav-toggle-btn close" onClick={() => setNavOpen(false)} title="Close Menu">
               <span role="img" aria-label="Close">✕</span>
             </button>
-            <button className="nav-btn" onClick={() => handleNav('home')} title="Home">
-              <span role="img" aria-label="Home">🏠</span>
-              <span className="nav-label">Home</span>
-            </button>
-            <button className="nav-btn" onClick={() => handleNav('dashboard')} title="Dashboard">
-              <span role="img" aria-label="Dashboard">📊</span>
-              <span className="nav-label">Dashboard</span>
-            </button>
-            <button className="nav-btn" onClick={() => handleNav('reading')} title="Reading">
-              <span role="img" aria-label="Reading">📖</span>
-              <span className="nav-label">Reading</span>
-            </button>
-            <button className="nav-btn" onClick={() => handleNav('shadowing')} title="Shadowing">
-              <span role="img" aria-label="Shadowing">🎤</span>
-              <span className="nav-label">Shadowing</span>
-            </button>
-            <button className="nav-btn" onClick={() => handleNav('simulator')} title="Simulator">
-              <span role="img" aria-label="Simulator">💬</span>
-              <span className="nav-label">Simulator</span>
-            </button>
-            <button className="nav-btn" onClick={() => handleNav('challenge')} title="Challenge">
-              <span role="img" aria-label="Challenge">🏆</span>
-              <span className="nav-label">Challenge</span>
-            </button>
-            <button className="nav-btn" onClick={() => handleNav('advanced')} title="Advanced Features">
-              <span role="img" aria-label="Advanced">🤖</span>
-              <span className="nav-label">Advanced Features</span>
+            <button className="nav-btn" onClick={() => handleNav('intro')} title="Intro">
+              <span role="img" aria-label="Intro">🏠</span>
+              <span className="nav-label">Intro</span>
             </button>
             <button className="nav-btn" onClick={() => handleNav('avatars')} title="Avatars">
               <span role="img" aria-label="Avatars">👥</span>
               <span className="nav-label">Avatars</span>
             </button>
-            <button className="nav-btn" onClick={() => handleNav('settings')} title="Settings">
-              <span role="img" aria-label="Settings">⚙️</span>
-              <span className="nav-label">Settings</span>
+            <button className="nav-btn" onClick={() => handleNav('advanced')} title="Advanced Features">
+              <span role="img" aria-label="Advanced Features">✨</span>
+              <span className="nav-label">Advanced Features</span>
+            </button>
+            <button className="nav-btn" onClick={() => handleNav('analytics')} title="Analytics">
+              <span role="img" aria-label="Analytics">📊</span>
+              <span className="nav-label">Analytics</span>
             </button>
             <button className="nav-btn" onClick={() => handleNav('signout')} title="Sign Out">
               <span role="img" aria-label="Sign Out">🚪</span>
@@ -243,24 +229,10 @@ export default function Dashboard() {
       </div>
       <div className="dashboard-header">
         <div className="header-left">
-          <span className="robot-icon" aria-label="Robot" role="img">
-            {/* Inline SVG for robot icon */}
-            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="8" y="14" width="32" height="22" rx="8" fill="#e0e7ef" stroke="#222" strokeWidth="2" />
-              <rect x="18" y="6" width="12" height="8" rx="4" fill="#b3c6e0" stroke="#222" strokeWidth="2" />
-              <circle cx="16" cy="25" r="3" fill="#222" />
-              <circle cx="32" cy="25" r="3" fill="#222" />
-              <rect x="20" y="32" width="8" height="2" rx="1" fill="#222" />
-              <rect x="6" y="20" width="4" height="8" rx="2" fill="#b3c6e0" stroke="#222" strokeWidth="2" />
-              <rect x="38" y="20" width="4" height="8" rx="2" fill="#b3c6e0" stroke="#222" strokeWidth="2" />
-            </svg>
-          </span>
-          <div className="header-text-column">
-            <h1>VocMate AI Tutor</h1>
-            <div className="dashboard-intro-typing">
-              <span className="typing-text">{displayedText}</span>
-              <span className="typing-cursor">|</span>
-            </div>
+          <img src="/logo.png" alt="VocMate AI Tutor" className="brand-logo" />
+          <div className="dashboard-intro-typing">
+            <span className="typing-text">{displayedText}</span>
+            <span className="typing-cursor">|</span>
           </div>
         </div>
       </div>
