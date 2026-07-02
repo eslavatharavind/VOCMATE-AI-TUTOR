@@ -47,7 +47,7 @@ export default function Dashboard() {
           console.error("Error parsing user from localStorage:", e);
         }
       }
-      
+
       const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         setUserId(session.user.id);
@@ -233,16 +233,16 @@ export default function Dashboard() {
         ) : (
           <>
             <div className="welcome-section" ref={introRef}>
-              <h2>Welcome to VOCMATE AI Tutor</h2>
+              <h2>VOCMATE AI Tutor</h2>
               <p>Practice English with your personal AI tutor. Improve your speaking, pronunciation, fluency, and confidence through real-time AI conversations.</p>
-              <button 
-                className="start-speaking-btn" 
+              <button
+                className="start-speaking-btn"
                 onClick={() => avatarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
               >
                 Start Speaking
               </button>
             </div>
-            
+
             <div className="animated-avatar-carousel-section" ref={avatarRef}>
               <h3>CHOOSE YOUR AVATAR</h3>
               <div className="animated-avatar-carousel-wrapper">
