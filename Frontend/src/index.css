@@ -6,6 +6,12 @@
     html, body {
         background-color: #0a0813;
         color: #cbd5e1;
+        overflow-x: hidden;
+        max-width: 100vw;
+        box-sizing: border-box;
+    }
+    *, *:before, *:after {
+        box-sizing: inherit;
     }
     body {
         @apply font-sans;

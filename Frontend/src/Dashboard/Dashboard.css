@@ -645,92 +645,184 @@ body {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+  /* Header */
   .dashboard-header {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 20px;
-    text-align: left;
+    padding: 10px 15px;
+    height: 70px;
+    box-sizing: border-box;
   }
 
   .header-left {
     flex-direction: row;
     align-items: center;
     gap: 10px;
+    max-width: calc(100% - 60px); /* Leave room for hamburger button */
   }
 
-  .user-avatar {
-    width: 44px;
-    height: 44px;
+  .robot-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .robot-icon svg {
+    width: 32px;
+    height: 32px;
   }
 
   .dashboard-header h1 {
-    font-size: 1.5rem;
+    font-size: 1.15rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-shadow: none;
+    text-overflow: ellipsis;
+  }
+
+  .dashboard-intro-typing {
+    font-size: 0.8rem;
+    min-height: auto;
+    letter-spacing: 0.5px;
+    margin-top: 1px;
+  }
+
+  .typing-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   .header-controls {
+    display: none; /* Hide default desktop controls on mobile, menu handles it */
+  }
+
+  /* Hamburger Menu Drawer */
+  .dashboard-nav-horizontal {
+    position: fixed;
+    top: 15px;
+    right: 15px;
+    z-index: 9999;
+  }
+
+  .nav-toggle-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.4rem;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  }
+
+  .nav-bar-content {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 280px;
+    height: 100vh;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    background: rgba(10, 8, 19, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 0;
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.5);
+    padding: 80px 24px;
+    gap: 24px;
+    margin: 0;
+    z-index: 99999;
+    box-sizing: border-box;
+  }
+
+  .nav-toggle-btn.close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    margin: 0;
+    background: transparent;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 32px;
+    height: 32px;
+    font-size: 1rem;
+  }
+
+  .nav-btn {
     flex-direction: row;
-    width: auto;
-    gap: 10px;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 1.2rem;
+    color: #a5b4fc;
+    background: rgba(255, 255, 255, 0.03);
   }
 
-  .advanced-features-btn,
-  .signout-btn {
-    width: auto;
-    padding: 8px 16px;
-    font-size: 0.9rem;
+  .nav-btn:hover {
+    background: rgba(99, 102, 241, 0.15);
+    color: #fff;
   }
 
-  .dashboard-content {
-    padding: 20px;
+  .nav-label {
+    color: #cbd5e1;
+    font-size: 1.1rem;
+    margin: 0;
   }
 
+  /* Hero Section */
   .welcome-section {
-    padding: 40px 10px;
+    padding: 20px 15px;
+    min-height: 80vh;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    box-sizing: border-box;
   }
 
   .welcome-section h2 {
-    font-size: 2.2rem;
+    font-size: 1.8rem !important;
+    letter-spacing: 2px !important;
+    margin-right: 0 !important;
+    line-height: 1.3;
+    margin-bottom: 12px;
   }
 
   .welcome-section p {
+    font-size: 0.95rem !important;
+    line-height: 1.5;
+    margin-bottom: 30px !important;
+    max-width: 90%;
+  }
+
+  .start-speaking-btn {
+    width: 100%;
+    max-width: 320px;
+    padding: 12px 24px;
     font-size: 1.1rem;
+    margin-top: 10px;
+    box-sizing: border-box;
   }
 
-  .practices-section {
-    padding: 1.5rem;
-    margin-bottom: 2rem;
+  /* Dashboard Cards / Layout */
+  .dashboard-content {
+    padding: 15px;
   }
 
-  .practices-section h3 {
-    font-size: 1.5rem;
+  .animated-avatar-carousel-section {
+    margin: 20px auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 16px !important;
+    border-radius: 20px !important;
+    box-sizing: border-box;
   }
 
   .practice-topics {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 0.8rem;
-  }
-
-  .practice-topic-btn {
-    padding: 10px 15px;
-    font-size: 0.9rem;
-  }
-
-  .feature-highlights {
-    flex-direction: column;
-    gap: 24px;
-    margin: 40px 0 0 0;
-  }
-
-  .feature-card {
-    min-width: 0;
-    max-width: 100%;
-    padding: 28px 12px 18px 12px;
-  }
-
-  .get-started-btn {
-    padding: 15px 30px;
-    font-size: 1.1rem;
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 }
 

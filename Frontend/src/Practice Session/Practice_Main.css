@@ -435,3 +435,90 @@
         height: 300px;
     }
 }
+
+@media (max-width: 768px) {
+    /* Header toolbar */
+    .session-header {
+        padding: 10px 16px;
+        box-sizing: border-box;
+    }
+    
+    .vocmate_session_head {
+        font-size: 1.1rem;
+    }
+
+    .session-back-btn {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+    
+    .end_session {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+        border-radius: 8px;
+    }
+
+    /* Layout stack */
+    .session-layout {
+        grid-template-columns: 1fr !important;
+        grid-template-rows: auto 1fr !important; /* Video height is auto, chat takes rest */
+        gap: 12px;
+        padding: 12px;
+        height: calc(100vh - 60px);
+        box-sizing: border-box;
+    }
+
+    /* Video container adjustments */
+    .video-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 220px !important; /* Lock video container height on mobile so chat has room */
+        border-radius: 16px;
+    }
+
+    /* AI tutor avatar scaling */
+    .tutor-avatar {
+        bottom: 10px;
+        right: 10px;
+        width: 90px !important;
+        height: 70px !important;
+        border-radius: 10px;
+    }
+
+    /* Chat container fills remaining space */
+    .conversation_container {
+        height: 100% !important; /* Fills the 1fr row correctly */
+        border-radius: 16px;
+    }
+
+    .message-area {
+        padding: 12px;
+    }
+
+    .message-bubble {
+        max-width: 90%;
+        padding: 8px 12px;
+        font-size: 0.88rem;
+    }
+    
+    /* Stats grid overlay on session exit */
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .report-card {
+        padding: 24px 16px !important;
+        border-radius: 20px !important;
+    }
+    
+    .report-card h2 {
+        font-size: 1.6rem !important;
+    }
+    
+    .report-subtitle {
+        margin-bottom: 1.5rem !important;
+    }
+}
