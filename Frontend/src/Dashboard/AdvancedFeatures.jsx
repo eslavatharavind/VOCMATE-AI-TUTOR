@@ -1499,8 +1499,10 @@ const AdvancedFeatures = (props) => {
   };
 
   const evaluatePronunciation = (userSpokenText) => {
-    if (!userSpokenText) return;
-    const targetWord = pronWords[currentPronIndex].word;
+    if (!userSpokenText || !pronWords || pronWords.length === 0) return;
+    const currentWordObj = pronWords[currentPronIndex];
+    if (!currentWordObj) return;
+    const targetWord = currentWordObj.word;
     const matchScore = calculateSimilarity(userSpokenText, targetWord);
     
     // Force a minimal logical accuracy score: if exact word matched in transcript, give high score
@@ -1512,31 +1514,39 @@ const AdvancedFeatures = (props) => {
     if (finalScore >= 85) {
       feedback = "Excellent! Perfect clear accent and pacing.";
     } else if (finalScore >= 60) {
-      feedback = `Good try! ${pronWords[currentPronIndex].tip}`;
+      feedback = `Good try! ${currentWordObj.tip}`;
     } else {
-      feedback = `Let's try again. ${pronWords[currentPronIndex].tip}`;
+      feedback = `Let's try again. ${currentWordObj.tip}`;
     }
     setPronFeedback(feedback);
+
+    // Automatically transition to next word after 2.5 seconds
+    setTimeout(() => {
+      handleNextPronWord(finalScore);
+    }, 2500);
   };
 
-  const handleNextPronWord = () => {
-    // Save current score
-    const updatedScores = [...pronWordScores, pronScore];
-    setPronWordScores(updatedScores);
-    setPronAttempt('');
-    setPronScore(0);
-    setPronFeedback('');
-    
-    if (currentPronIndex < 3) {
-      setCurrentPronIndex(prev => prev + 1);
-    } else {
-      // Calculate final average score
-      const totalScore = updatedScores.reduce((acc, s) => acc + s, 0);
-      const averageScore = Math.round(totalScore / 4);
-      setPronScore(averageScore);
-      setPronSession('result');
-      recordSession('Pronunciation Practice', averageScore);
-    }
+  const handleNextPronWord = (scoreToRecord) => {
+    const scoreVal = scoreToRecord !== undefined ? scoreToRecord : pronScore;
+    setPronWordScores(prev => {
+      const updatedScores = [...prev, scoreVal];
+      
+      setPronAttempt('');
+      setPronScore(0);
+      setPronFeedback('');
+      
+      if (currentPronIndex < 3) {
+        setCurrentPronIndex(prevIdx => prevIdx + 1);
+      } else {
+        // Calculate final average score
+        const totalScore = updatedScores.reduce((acc, s) => acc + s, 0);
+        const averageScore = Math.round(totalScore / 4);
+        setPronScore(averageScore);
+        setPronSession('result');
+        recordSession('Pronunciation Practice', averageScore);
+      }
+      return updatedScores;
+    });
   };
 
   // Main UI Render Method

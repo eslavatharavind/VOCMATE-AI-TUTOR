@@ -100,34 +100,34 @@
   gap: 12px;
 }
 
-/* Shared styles for primary navigation buttons - Clean white design */
+/* Shared styles for primary navigation buttons - Compact Glassmorphism */
 .main-back-btn,
 .menu-back-btn {
-  background: white !important;
-  color: #4f46e5 !important;
-  border: 1px solid rgba(79, 70, 229, 0.25) !important;
-  padding: 8px 16px !important;
-  border-radius: 12px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  padding: 6px 14px !important;
+  border-radius: 8px !important;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  box-shadow: none;
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.9rem !important;
-  height: 40px !important;
+  gap: 8px;
+  font-size: 0.82rem !important;
+  height: 32px !important;
   justify-content: center;
-  flex: 1;
+  flex: none;
 }
 
 /* Hover state for navigation buttons */
 .main-back-btn:hover,
 .menu-back-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 16px -4px rgba(79, 70, 229, 0.15);
-  background: #f5f3ff !important;
-  border-color: #4f46e5 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(99, 102, 241, 0.4) !important;
   filter: none !important;
 }
 
@@ -318,41 +318,43 @@
 /* Common heading style for sub-features */
 .feature-container h3,
 .feature-container h4 {
-  color: #1e1b4b;
-  /* Deep Indigo for visibility */
+  color: #ffffff;
+  /* White for visibility on dark background */
   font-weight: 800;
   margin-bottom: 24px;
   text-align: center;
 }
 
 .feature-container h3 {
-  font-size: 2rem;
+  font-size: 2.0rem;
   letter-spacing: -0.02em;
 }
 
 .feature-container h4 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
 }
 
-/* Critical Fix: Ensure labels and descriptive text are dark and visible */
+/* Critical Fix: Ensure labels and descriptive text are light and visible */
 .feature-container p,
 .feature-container span,
 .feature-container label {
-  color: #334155;
-  /* Slate 700 for high legibility */
-  font-size: 1.1rem;
+  color: #cbd5e1;
+  /* Light slate for high legibility */
+  font-size: 1rem;
   line-height: 1.6;
 }
 
 /* Premium Glassmorphic Card for Sub-Features */
 .lux-card {
-  background: rgba(255, 255, 255, 0.75);
-  backdrop-filter: blur(12px);
-  border-radius: 32px;
-  border: 1px solid rgba(255, 255, 255, 1);
-  padding: 40px;
-  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 32px;
+  box-shadow: 0 20px 50px -12px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.05);
+  margin-bottom: 24px;
+  color: #ffffff;
 }
 
 /* Shared Premium Button Styling for all sub-features */
@@ -360,10 +362,10 @@
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
   color: white;
   border: none;
-  padding: 14px 28px;
-  border-radius: 16px;
+  padding: 12px 24px;
+  border-radius: 12px;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 10px 15px -3px rgba(79, 70, 229, 0.2);
@@ -380,18 +382,24 @@
 }
 
 .lux-button:disabled {
-  background: #e2e8f0;
-  color: #94a3b8;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.35);
   cursor: not-allowed;
   transform: none;
   box-shadow: none;
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 /* Secondary/Alternative button style */
 .lux-button-secondary {
-  background: white;
-  color: #4f46e5;
-  border: 1px solid #e2e8f0;
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.lux-button-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
 .lux-button-secondary:hover {
