@@ -1,5 +1,6 @@
 // Import necessary React hooks and components
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 // Import the ReadingPractice component for use within AdvancedFeatures
 import ReadingPractice from './ReadingPractice';
 // Import the CSS file for styling the AdvancedFeatures component
@@ -7,6 +8,7 @@ import './AdvancedFeatures.css';
 
 // Define the AdvancedFeatures component which takes userId and onBack as props
 const AdvancedFeatures = (props) => {
+  const navigate = useNavigate();
   const { userId, onBack, initialTab } = props;
   // State to track the currently active feature tab (null means showing the menu)
   const [localActiveTab, setLocalActiveTab] = useState(initialTab || null);
@@ -147,6 +149,34 @@ const AdvancedFeatures = (props) => {
   // State to store chunks of recorded audio data
   const [audioChunks, setAudioChunks] = useState([]);
   const [showConfetti, setShowConfetti] = useState(false);
+
+  // Vocabulary Builder states
+  const [vocabSession, setVocabSession] = useState('setup'); // 'setup' | 'practice' | 'quiz' | 'result'
+  const [vocabWords, setVocabWords] = useState([]);
+  const [currentVocabIndex, setCurrentVocabIndex] = useState(0);
+  const [vocabQuizScore, setVocabQuizScore] = useState(0);
+  const [vocabQuizAnswers, setVocabQuizAnswers] = useState([]);
+  const [vocabLoading, setVocabLoading] = useState(false);
+  const [favoriteWords, setFavoriteWords] = useState([]);
+
+  // Grammar Practice states
+  const [grammarSession, setGrammarSession] = useState('setup'); // 'setup' | 'practice' | 'result'
+  const [grammarExercises, setGrammarExercises] = useState([]);
+  const [currentGrammarIndex, setCurrentGrammarIndex] = useState(0);
+  const [grammarScore, setGrammarScore] = useState(0);
+  const [grammarAnswers, setGrammarAnswers] = useState([]);
+  const [grammarLoading, setGrammarLoading] = useState(false);
+  const [grammarFeedback, setGrammarFeedback] = useState([]);
+
+  // Pronunciation Coach states
+  const [pronSession, setPronSession] = useState('setup'); // 'setup' | 'practice' | 'result'
+  const [pronWords, setPronWords] = useState([]);
+  const [currentPronIndex, setCurrentPronIndex] = useState(0);
+  const [pronAttempt, setPronAttempt] = useState('');
+  const [pronScore, setPronScore] = useState(0);
+  const [pronFeedback, setPronFeedback] = useState('');
+  const [pronWordScores, setPronWordScores] = useState([]);
+  const [pronLoading, setPronLoading] = useState(false);
   
   // Ref to handle SpeechRecognition.onresult callback dynamically and avoid React stale closures
   const onSpeechRecognizedRef = useRef(null);
@@ -170,6 +200,9 @@ const AdvancedFeatures = (props) => {
       setSpokenText('');
       setShadowingFeedback(null);
       setIsListening(false);
+      setVocabSession('setup');
+      setGrammarSession('setup');
+      setPronSession('setup');
     }
   }, [activeTab]);
 
@@ -524,6 +557,9 @@ const AdvancedFeatures = (props) => {
           const sep = prev ? ' ' : '';
           return prev + sep + transcript;
         });
+      } else if (activeTab === 'pronunciation') {
+        setPronAttempt(transcript);
+        evaluatePronunciation(transcript);
       }
     };
   });
@@ -1262,6 +1298,244 @@ const AdvancedFeatures = (props) => {
       loadProgressData();
     } catch (error) {
       console.error('Error recording session:', error);
+    }
+  };
+
+  // --- Pronunciation Coach Similarity Helper ---
+  const calculateSimilarity = (s1, s2) => {
+    const clean = (s) => s.toLowerCase().replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g,"").replace(/\s+/g," ").trim();
+    const w1 = clean(s1).split(" ");
+    const w2 = clean(s2).split(" ");
+    if (w1.length === 0 || w2.length === 0) return 0;
+    let matches = 0;
+    w1.forEach(word => {
+      if (w2.includes(word)) {
+        matches++;
+      }
+    });
+    return Math.round((matches / Math.max(w1.length, w2.length)) * 100);
+  };
+
+  // --- Vocabulary Builder Helpers ---
+  const vocabLibrary = [
+    { word: "Eloquent", phonetic: "/ˈel.ə.kwənt/", definition: "Fluent or persuasive in speaking or writing.", example: "She gave an eloquent speech that moved the entire audience.", synonyms: "persuasive, articulate, expressive", antonyms: "inarticulate, hesitant, tongue-tied" },
+    { word: "Resilient", phonetic: "/rɪˈzɪl.i.ənt/", definition: "Able to withstand or recover quickly from difficult conditions.", example: "The local businesses proved resilient despite the economic downturn.", synonyms: "tough, hardy, strong", antonyms: "vulnerable, fragile, weak" },
+    { word: "Pragmatic", phonetic: "/præɡˈmæt.ɪk/", definition: "Dealing with things sensibly and realistically in a practical way.", example: "We need a pragmatic approach to solve this budget issue.", synonyms: "practical, sensible, down-to-earth", antonyms: "idealistic, impractical, visionary" },
+    { word: "Ubiquitous", phonetic: "/juːˈbɪk.wɪ.təs/", definition: "Present, appearing, or found everywhere.", example: "Smartphones have become ubiquitous in modern society.", synonyms: "omnipresent, universal, widespread", antonyms: "rare, scarce, unique" },
+    { word: "Meticulous", phonetic: "/məˈtɪk.jə.ləs/", definition: "Showing great attention to detail; very careful and precise.", example: "He was meticulous about keeping his desk clean and organized.", synonyms: "precise, careful, diligent", antonyms: "careless, sloppy, negligent" },
+    { word: "Cognizant", phonetic: "/ˈkɒɡ.nɪ.zənt/", definition: "Having knowledge or being aware of something.", example: "We must be cognizant of the potential risks before investing.", synonyms: "aware, conscious, mindful", antonyms: "unaware, ignorant, oblivious" },
+    { word: "Superfluous", phonetic: "/suːˈpɜː.flu.əs/", definition: "Unnecessary, especially through being more than enough.", example: "Avoid adding superfluous details to your business report.", synonyms: "redundant, excess, extra", antonyms: "necessary, essential, vital" },
+    { word: "Exacerbate", phonetic: "/ɪɡˈzæs.ə.beɪt/", definition: "Make a problem, bad situation, or negative feeling worse.", example: "Running on a sprained ankle will only exacerbate the injury.", synonyms: "aggravate, worsen, inflame", antonyms: "alleviate, improve, soothe" }
+  ];
+
+  const speakText = (text) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      window.speechSynthesis.speak(utterance);
+    }
+  };
+
+  const startVocabPractice = async () => {
+    setVocabLoading(true);
+    setVocabSession('practice');
+    setCurrentVocabIndex(0);
+    
+    try {
+      // Shuffle library and take 5 words
+      const shuffled = [...vocabLibrary].sort(() => 0.5 - Math.random()).slice(0, 5);
+      setVocabWords(shuffled);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setVocabLoading(false);
+    }
+  };
+
+  const toggleFavorite = (word) => {
+    if (favoriteWords.includes(word)) {
+      setFavoriteWords(prev => prev.filter(w => w !== word));
+    } else {
+      setFavoriteWords(prev => [...prev, word]);
+    }
+  };
+
+  const startVocabQuiz = () => {
+    // Generate questions
+    const quizData = vocabWords.map((item, index) => {
+      // Correct definition
+      const correctDef = item.definition;
+      // Gather incorrect definitions from the other words
+      const incorrectDefs = vocabLibrary
+        .filter(w => w.word !== item.word)
+        .map(w => w.definition);
+      // Take 3 random incorrect definitions
+      const randomIncorrect = incorrectDefs.sort(() => 0.5 - Math.random()).slice(0, 3);
+      // Mix and shuffle options
+      const options = [correctDef, ...randomIncorrect].sort(() => 0.5 - Math.random());
+      
+      return {
+        word: item.word,
+        correctOption: correctDef,
+        options: options
+      };
+    });
+    
+    setVocabQuizAnswers(new Array(5).fill(null));
+    setVocabQuizScore(0);
+    setVocabWords(vocabWords.map((w, idx) => ({ ...w, quiz: quizData[idx] })));
+    setVocabSession('quiz');
+    setCurrentVocabIndex(0);
+  };
+
+  const handleSelectVocabAnswer = (option) => {
+    const updatedAnswers = [...vocabQuizAnswers];
+    updatedAnswers[currentVocabIndex] = option;
+    setVocabQuizAnswers(updatedAnswers);
+  };
+
+  const submitVocabQuiz = () => {
+    let finalScore = 0;
+    vocabWords.forEach((wordObj, idx) => {
+      if (vocabQuizAnswers[idx] === wordObj.definition) {
+        finalScore += 20; // 20 points per correct answer (total 100)
+      }
+    });
+    setVocabQuizScore(finalScore);
+    setVocabSession('result');
+    recordSession('Vocabulary Practice', finalScore);
+  };
+
+  // --- Grammar Practice Helpers ---
+  const grammarQuestionBank = [
+    { type: "blank", sentence: "She ___ to school every day by bus.", options: ["goes", "go", "going", "gone"], correctAnswer: "goes", explanation: "For third-person singular (She), the present simple verb takes '-es' (goes)." },
+    { type: "blank", sentence: "We look forward to ___ you at the conference next week.", options: ["seeing", "see", "seen", "to see"], correctAnswer: "seeing", explanation: "'Look forward to' is followed by a gerund (verb + -ing)." },
+    { type: "blank", sentence: "If it ___ tomorrow, we will cancel our picnic.", options: ["rains", "rain", "will rain", "rained"], correctAnswer: "rains", explanation: "In the first conditional, the 'if' clause uses present simple (rains)." },
+    { type: "correction", prompt: "Fix the grammatical errors in this sentence:", sentence: "He don't has no money for buying food.", correctAnswer: "He doesn't have any money to buy food.", explanation: "'He' takes 'doesn't', double negatives ('don't has no') should be replaced with 'doesn't have any', and 'for buying' becomes 'to buy'." },
+    { type: "correction", prompt: "Correct the sentence punctuation and tense:", sentence: "She is living here since five years.", correctAnswer: "She has been living here for five years.", explanation: "Use present perfect continuous ('has been living') for action starting in the past continuing now, and 'for' to denote a duration of time ('five years')." },
+    { type: "blank", sentence: "He is interested ___ learning new foreign languages.", options: ["in", "on", "at", "about"], correctAnswer: "in", explanation: "The adjective 'interested' is paired with the preposition 'in'." },
+    { type: "blank", sentence: "They have been married ___ twenty years.", options: ["for", "since", "during", "ago"], correctAnswer: "for", explanation: "Use 'for' to show a duration of time (20 years) and 'since' for a specific point in time." },
+    { type: "correction", prompt: "Fix the subject-verb agreement:", sentence: "Every one of the students are ready for the test.", correctAnswer: "Every one of the students is ready for the test.", explanation: "'Every one' is a singular subject, so it requires a singular verb ('is')." }
+  ];
+
+  const startGrammarPractice = () => {
+    setGrammarLoading(true);
+    setGrammarSession('practice');
+    setCurrentGrammarIndex(0);
+    setGrammarScore(0);
+    setGrammarAnswers(new Array(5).fill(''));
+    
+    // Select 5 random exercises
+    const shuffled = [...grammarQuestionBank].sort(() => 0.5 - Math.random()).slice(0, 5);
+    setGrammarExercises(shuffled);
+    setGrammarLoading(false);
+  };
+
+  const handleGrammarSubmitAnswer = (val) => {
+    const updatedAnswers = [...grammarAnswers];
+    updatedAnswers[currentGrammarIndex] = val;
+    setGrammarAnswers(updatedAnswers);
+    
+    // Auto-advance or wait
+    if (currentGrammarIndex < 4) {
+      setCurrentGrammarIndex(prev => prev + 1);
+    } else {
+      // Evaluate and calculate results
+      let finalScore = 0;
+      const feedbackArray = [];
+      
+      grammarExercises.forEach((ex, idx) => {
+        const userAns = updatedAnswers[idx].trim().toLowerCase();
+        const correctAns = ex.correctAnswer.trim().toLowerCase();
+        let isCorrect = false;
+        
+        if (ex.type === 'blank') {
+          isCorrect = userAns === correctAns;
+        } else {
+          // Fuzzy comparison for user typing correction
+          const score = calculateSimilarity(userAns, correctAns);
+          isCorrect = score >= 75;
+        }
+        
+        if (isCorrect) finalScore += 20;
+        feedbackArray.push({
+          exercise: ex,
+          userAnswer: updatedAnswers[idx],
+          isCorrect,
+          scoreValue: isCorrect ? 20 : 0
+        });
+      });
+      
+      setGrammarScore(finalScore);
+      setGrammarFeedback(feedbackArray);
+      setGrammarSession('result');
+      recordSession('Grammar Practice', finalScore);
+    }
+  };
+
+  // --- Pronunciation Coach Helpers ---
+  const pronWordsLibrary = [
+    { word: "Entrepreneurship", phonetic: "/ˌɒn.trə.prəˈnɜː.ʃɪp/", tip: "Focus on the first sound: 'ON-truh-pruh-NUR-ship'. Keep the 'r' sounds smooth." },
+    { word: "Phenomenon", phonetic: "/fəˈnɒm.ɪ.nən/", tip: "Pronounce as 'fuh-NOM-uh-non'. Make sure the 'm' and 'n' are distinct." },
+    { word: "Mischievous", phonetic: "/ˈmɪs.tʃɪ.vəs/", tip: "Say 'MIS-chih-vuhs'. Do not add an extra syllable (it's not mis-chee-vee-uhs)." },
+    { word: "Specific", phonetic: "/spəˈsɪf.ɪk/", tip: "Start with a soft 'spuh' sound: 'spuh-SIF-ik'. Avoid saying 'pacific'." },
+    { word: "Anemone", phonetic: "/əˈnem.ə.ni/", tip: "Pronounce as 'uh-NEM-uh-nee'. Keep the syllables light and flowing." },
+    { word: "Asterisk", phonetic: "/ˈæs.tə.rɪsk/", tip: "End clearly with the 'sk' sound: 'AS-tuh-risk'. Avoid saying 'asterix'." }
+  ];
+
+  const startPronPractice = () => {
+    setPronLoading(true);
+    setPronSession('practice');
+    setCurrentPronIndex(0);
+    setPronWordScores([]);
+    setPronAttempt('');
+    setPronScore(0);
+    setPronFeedback('');
+    
+    const shuffled = [...pronWordsLibrary].sort(() => 0.5 - Math.random()).slice(0, 4);
+    setPronWords(shuffled);
+    setPronLoading(false);
+  };
+
+  const evaluatePronunciation = (userSpokenText) => {
+    if (!userSpokenText) return;
+    const targetWord = pronWords[currentPronIndex].word;
+    const matchScore = calculateSimilarity(userSpokenText, targetWord);
+    
+    // Force a minimal logical accuracy score: if exact word matched in transcript, give high score
+    const finalScore = matchScore > 0 ? Math.max(matchScore, 70) : 10;
+    
+    setPronScore(finalScore);
+    
+    let feedback = "";
+    if (finalScore >= 85) {
+      feedback = "Excellent! Perfect clear accent and pacing.";
+    } else if (finalScore >= 60) {
+      feedback = `Good try! ${pronWords[currentPronIndex].tip}`;
+    } else {
+      feedback = `Let's try again. ${pronWords[currentPronIndex].tip}`;
+    }
+    setPronFeedback(feedback);
+  };
+
+  const handleNextPronWord = () => {
+    // Save current score
+    const updatedScores = [...pronWordScores, pronScore];
+    setPronWordScores(updatedScores);
+    setPronAttempt('');
+    setPronScore(0);
+    setPronFeedback('');
+    
+    if (currentPronIndex < 3) {
+      setCurrentPronIndex(prev => prev + 1);
+    } else {
+      // Calculate final average score
+      const totalScore = updatedScores.reduce((acc, s) => acc + s, 0);
+      const averageScore = Math.round(totalScore / 4);
+      setPronScore(averageScore);
+      setPronSession('result');
+      recordSession('Pronunciation Practice', averageScore);
     }
   };
 
@@ -2732,153 +3006,637 @@ const AdvancedFeatures = (props) => {
         {/* ========== Vocabulary Builder Module ========== */}
         {activeTab === 'vocabulary' && (
           <div className="feature-container" style={{ animation: 'fadeIn 0.4s ease' }}>
-            <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-                <span style={{ fontSize: '3rem' }}>📚</span>
-                <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#1e1b4b' }}>Vocabulary Builder</h3>
-                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Learn new words every day with AI-powered lessons</p>
-              </div>
+            {vocabSession === 'setup' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                  <span style={{ fontSize: '3rem' }}>📚</span>
+                  <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#ffffff' }}>Vocabulary Builder</h3>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>Learn new words every day with AI-powered lessons</p>
+                </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-                {[
-                  { icon: '📖', title: 'Word of the Day', desc: 'New word with meaning & examples' },
-                  { icon: '🔤', title: 'Synonyms & Antonyms', desc: 'Expand your word network' },
-                  { icon: '🎤', title: 'Pronunciation', desc: 'Hear and practice word sounds' },
-                  { icon: '📝', title: 'Example Sentences', desc: 'See words used in context' },
-                  { icon: '⭐', title: 'Favourite Words', desc: 'Save and review later' },
-                  { icon: '🧠', title: 'AI Vocabulary Quiz', desc: 'Test your word knowledge' },
-                ].map((item, i) => (
-                  <div key={i} style={{
-                    background: 'rgba(99, 102, 241, 0.06)',
-                    border: '1px solid rgba(99, 102, 241, 0.12)',
-                    borderRadius: '14px',
-                    padding: '16px',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}>
-                    <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: '700', color: '#1e1b4b', fontSize: '0.92rem' }}>{item.title}</div>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                  {[
+                    { icon: '📖', title: 'Word of the Day', desc: 'New word with meaning & examples' },
+                    { icon: '🔤', title: 'Synonyms & Antonyms', desc: 'Expand your word network' },
+                    { icon: '🎤', title: 'Pronunciation', desc: 'Hear and practice word sounds' },
+                    { icon: '📝', title: 'Example Sentences', desc: 'See words used in context' },
+                    { icon: '⭐', title: 'Favourite Words', desc: 'Save and review later' },
+                    { icon: '🧠', title: 'AI Vocabulary Quiz', desc: 'Test your word knowledge' },
+                  ].map((item, i) => (
+                    <div key={i} style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '14px',
+                      padding: '16px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px'
+                    }}>
+                      <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.92rem' }}>{item.title}</div>
+                        <div style={{ color: '#cbd5e1', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background: 'rgba(99, 102, 241, 0.1)', border: '1px solid rgba(99, 102, 241, 0.2)', borderRadius: '16px', padding: '24px', textAlign: 'center', marginBottom: '24px' }}>
+                  <h4 style={{ margin: '0 0 8px', color: '#a5b4fc', fontWeight: '700' }}>🌟 Today's Focus Word: "Eloquent"</h4>
+                  <p style={{ color: '#ffffff', fontSize: '0.9rem', margin: '0 0 4px' }}><strong>Meaning:</strong> Fluent or persuasive in speaking or writing</p>
+                  <p style={{ color: '#a5b4fc', fontSize: '0.9rem', margin: '0 0 12px', fontStyle: 'italic' }}>"She gave an eloquent speech about climate change."</p>
+                </div>
+                
+                <div style={{ textAlign: 'center' }}>
+                  <button onClick={startVocabPractice} className="lux-button" style={{ padding: '12px 36px', fontSize: '1rem', width: '100%', maxWidth: '280px' }}>
+                    Start Practice →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {vocabSession === 'practice' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '700px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                {vocabLoading ? (
+                  <div style={{ textAlign: 'center', padding: '40px' }}>Loading word list...</div>
+                ) : (
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+                      <span style={{ fontSize: '0.88rem', background: 'rgba(255,255,255,0.08)', padding: '4px 12px', borderRadius: '12px' }}>
+                        Word {currentVocabIndex + 1} of {vocabWords.length}
+                      </span>
+                      <button 
+                        onClick={() => toggleFavorite(vocabWords[currentVocabIndex]?.word)}
+                        style={{ background: 'none', border: 'none', fontSize: '1.4rem', cursor: 'pointer', outline: 'none' }}
+                      >
+                        {favoriteWords.includes(vocabWords[currentVocabIndex]?.word) ? '⭐' : '☆'}
+                      </button>
+                    </div>
+
+                    <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                      <h2 style={{ fontSize: '2.5rem', fontWeight: '800', margin: '0 0 4px', color: '#ffffff' }}>
+                        {vocabWords[currentVocabIndex]?.word}
+                      </h2>
+                      <p style={{ fontSize: '1.1rem', color: '#a5b4fc', margin: '0 0 12px' }}>
+                        {vocabWords[currentVocabIndex]?.phonetic}
+                      </p>
+                      <button 
+                        onClick={() => speakText(vocabWords[currentVocabIndex]?.word)}
+                        className="lux-button lux-button-secondary"
+                        style={{ padding: '6px 16px', fontSize: '0.85rem', height: '32px', background: 'rgba(255,255,255,0.1)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.2)' }}
+                      >
+                        🔊 Listen
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px', marginBottom: '32px' }}>
+                      <div>
+                        <strong style={{ color: '#a5b4fc', fontSize: '0.9rem', textTransform: 'uppercase' }}>Definition</strong>
+                        <p style={{ margin: '4px 0 0', color: '#ffffff', fontSize: '1rem' }}>{vocabWords[currentVocabIndex]?.definition}</p>
+                      </div>
+                      <div>
+                        <strong style={{ color: '#a5b4fc', fontSize: '0.9rem', textTransform: 'uppercase' }}>Example Sentence</strong>
+                        <p style={{ margin: '4px 0 0', color: '#ffffff', fontSize: '1rem', fontStyle: 'italic' }}>"{vocabWords[currentVocabIndex]?.example}"</p>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                        <div>
+                          <strong style={{ color: '#a5b4fc', fontSize: '0.9rem', textTransform: 'uppercase' }}>Synonyms</strong>
+                          <p style={{ margin: '4px 0 0', color: '#cbd5e1', fontSize: '0.9rem' }}>{vocabWords[currentVocabIndex]?.synonyms}</p>
+                        </div>
+                        <div>
+                          <strong style={{ color: '#a5b4fc', fontSize: '0.9rem', textTransform: 'uppercase' }}>Antonyms</strong>
+                          <p style={{ margin: '4px 0 0', color: '#cbd5e1', fontSize: '0.9rem' }}>{vocabWords[currentVocabIndex]?.antonyms}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '12px' }}>
+                      {currentVocabIndex < vocabWords.length - 1 ? (
+                        <button 
+                          onClick={() => setCurrentVocabIndex(prev => prev + 1)}
+                          className="lux-button"
+                          style={{ flex: 1 }}
+                        >
+                          Next Word →
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={startVocabQuiz}
+                          className="lux-button"
+                          style={{ flex: 1, background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+                        >
+                          Start Vocabulary Quiz 🧠
+                        </button>
+                      )}
                     </div>
                   </div>
-                ))}
+                )}
               </div>
+            )}
 
-              <div style={{ background: 'linear-gradient(135deg, #ede9fe, #e0e7ff)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
-                <h4 style={{ margin: '0 0 8px', color: '#4338ca', fontWeight: '700' }}>🌟 Today's Word: "Eloquent"</h4>
-                <p style={{ color: '#6366f1', fontSize: '0.9rem', margin: '0 0 4px' }}><strong>Meaning:</strong> Fluent or persuasive in speaking or writing</p>
-                <p style={{ color: '#6366f1', fontSize: '0.9rem', margin: '0 0 12px', fontStyle: 'italic' }}>"She gave an eloquent speech about climate change."</p>
-                <button className="lux-button" style={{ padding: '10px 28px', fontSize: '0.95rem' }}>
-                  Start Practice →
-                </button>
+            {vocabSession === 'quiz' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '650px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.9rem', background: 'rgba(255,255,255,0.08)', padding: '4px 12px', borderRadius: '12px' }}>
+                    Question {currentVocabIndex + 1} of 5
+                  </span>
+                </div>
+
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                  <p style={{ margin: '0 0 8px', color: '#cbd5e1', fontSize: '0.95rem' }}>Select the correct definition for the word:</p>
+                  <h3 style={{ fontSize: '2rem', color: '#ffffff', margin: 0, fontWeight: '800' }}>
+                    "{vocabWords[currentVocabIndex]?.word}"
+                  </h3>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '32px' }}>
+                  {vocabWords[currentVocabIndex]?.quiz?.options.map((option, i) => {
+                    const isSelected = vocabQuizAnswers[currentVocabIndex] === option;
+                    return (
+                      <button
+                        key={i}
+                        onClick={() => handleSelectVocabAnswer(option)}
+                        style={{
+                          padding: '14px 18px',
+                          borderRadius: '12px',
+                          border: isSelected ? '2px solid #6366f1' : '1px solid rgba(255,255,255,0.1)',
+                          background: isSelected ? 'rgba(99, 102, 241, 0.2)' : 'rgba(255,255,255,0.03)',
+                          color: '#ffffff',
+                          textAlign: 'left',
+                          cursor: 'pointer',
+                          fontSize: '0.9rem',
+                          transition: 'all 0.2s ease',
+                          outline: 'none'
+                        }}
+                      >
+                        {option}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  {currentVocabIndex < 4 ? (
+                    <button
+                      onClick={() => {
+                        if (!vocabQuizAnswers[currentVocabIndex]) {
+                          alert("Please select an answer first.");
+                          return;
+                        }
+                        setCurrentVocabIndex(prev => prev + 1);
+                      }}
+                      className="lux-button"
+                      style={{ flex: 1 }}
+                    >
+                      Next Question
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        if (!vocabQuizAnswers[currentVocabIndex]) {
+                          alert("Please select an answer first.");
+                          return;
+                        }
+                        submitVocabQuiz();
+                      }}
+                      className="lux-button"
+                      style={{ flex: 1, background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}
+                    >
+                      Finish and Get Score 🏆
+                    </button>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+
+            {vocabSession === 'result' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '600px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff', textAlign: 'center' }}>
+                <span style={{ fontSize: '4rem' }}>🏆</span>
+                <h3 style={{ margin: '12px 0 6px', fontSize: '1.8rem', fontWeight: '800', color: '#ffffff' }}>Practice Completed!</h3>
+                <p style={{ color: '#cbd5e1', fontSize: '1rem', margin: '0 0 24px' }}>Here is your Vocabulary builder score:</p>
+
+                <div style={{
+                  width: '130px',
+                  height: '130px',
+                  borderRadius: '50%',
+                  background: `conic-gradient(#10b981 ${vocabQuizScore}%, rgba(255,255,255,0.08) ${vocabQuizScore}% 100%)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 28px',
+                  boxShadow: '0 8px 24px rgba(16, 185, 129, 0.15)'
+                }}>
+                  <div style={{
+                    width: '110px',
+                    height: '110px',
+                    borderRadius: '50%',
+                    backgroundColor: '#110d29',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{ fontSize: '2.2rem', fontWeight: '800', color: '#ffffff' }}>
+                      {vocabQuizScore}%
+                    </span>
+                    <span style={{ fontSize: '0.62rem', color: '#94a3b8', fontWeight: '700', textTransform: 'uppercase' }}>
+                      Quiz Score
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <button onClick={startVocabPractice} className="lux-button" style={{ flex: 1 }}>
+                    🔄 Practice Again
+                  </button>
+                  <button onClick={() => setVocabSession('setup')} className="lux-button lux-button-secondary" style={{ flex: 1, background: 'rgba(255,255,255,0.08)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.1)' }}>
+                    📁 Menu View
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* ========== Grammar Practice Module ========== */}
         {activeTab === 'grammar' && (
           <div className="feature-container" style={{ animation: 'fadeIn 0.4s ease' }}>
-            <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-                <span style={{ fontSize: '3rem' }}>✍️</span>
-                <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#1e1b4b' }}>Grammar Practice</h3>
-                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Master English grammar with AI-powered corrections</p>
-              </div>
+            {grammarSession === 'setup' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                  <span style={{ fontSize: '3rem' }}>✍️</span>
+                  <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#ffffff' }}>Grammar Practice</h3>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>Master English grammar with AI-powered corrections</p>
+                </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-                {[
-                  { icon: '✏️', title: 'Sentence Correction', desc: 'Fix grammar errors in sentences' },
-                  { icon: '⏰', title: 'Tenses Practice', desc: 'Master all 12 English tenses' },
-                  { icon: '📌', title: 'Articles & Prepositions', desc: 'A, an, the, in, on, at...' },
-                  { icon: '🔄', title: 'Voice Correction', desc: 'Active & passive voice' },
-                  { icon: '🤖', title: 'AI Explanations', desc: 'Understand why it\'s wrong' },
-                  { icon: '📝', title: 'Writing Practice', desc: 'Write and get AI feedback' },
-                ].map((item, i) => (
-                  <div key={i} style={{
-                    background: 'rgba(16, 185, 129, 0.06)',
-                    border: '1px solid rgba(16, 185, 129, 0.12)',
-                    borderRadius: '14px',
-                    padding: '16px',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}>
-                    <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: '700', color: '#1e1b4b', fontSize: '0.92rem' }}>{item.title}</div>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                  {[
+                    { icon: '✏️', title: 'Sentence Correction', desc: 'Fix grammar errors in sentences' },
+                    { icon: '⏰', title: 'Tenses Practice', desc: 'Master all 12 English tenses' },
+                    { icon: '📌', title: 'Articles & Prepositions', desc: 'A, an, the, in, on, at...' },
+                    { icon: '🔄', title: 'Voice Correction', desc: 'Active & passive voice' },
+                    { icon: '🤖', title: 'AI Explanations', desc: 'Understand why it\'s wrong' },
+                    { icon: '📝', title: 'Writing Practice', desc: 'Write and get AI feedback' },
+                  ].map((item, i) => (
+                    <div key={i} style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '14px',
+                      padding: '16px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px'
+                    }}>
+                      <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.92rem' }}>{item.title}</div>
+                        <div style={{ color: '#cbd5e1', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px solid rgba(16, 185, 129, 0.2)', borderRadius: '16px', padding: '24px', textAlign: 'center', marginBottom: '24px' }}>
+                  <h4 style={{ margin: '0 0 10px', color: '#a7f3d0', fontWeight: '700' }}>🧪 Quick Grammar Challenge</h4>
+                  <p style={{ color: '#ffffff', fontSize: '0.9rem', margin: '0 0 6px' }}>Correct this sentence:</p>
+                  <p style={{ color: '#a7f3d0', fontSize: '1rem', fontWeight: '600', fontStyle: 'italic', margin: '0 0 14px' }}>"She don't likes to swimming."</p>
+                </div>
+                
+                <div style={{ textAlign: 'center' }}>
+                  <button onClick={startGrammarPractice} className="lux-button" style={{ padding: '12px 36px', fontSize: '1rem', width: '100%', maxWidth: '280px' }}>
+                    Start Practice →
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {grammarSession === 'practice' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '650px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.9rem', background: 'rgba(255,255,255,0.08)', padding: '4px 12px', borderRadius: '12px' }}>
+                    Exercise {currentGrammarIndex + 1} of 5
+                  </span>
+                </div>
+
+                {grammarExercises[currentGrammarIndex]?.type === 'blank' ? (
+                  <div>
+                    <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                      <p style={{ margin: '0 0 12px', color: '#cbd5e1', fontSize: '0.95rem' }}>Select the correct option to fill in the blank:</p>
+                      <h3 style={{ fontSize: '1.4rem', color: '#ffffff', margin: 0, fontWeight: '700', lineHeight: '1.5' }}>
+                        {grammarExercises[currentGrammarIndex]?.sentence}
+                      </h3>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '24px' }}>
+                      {grammarExercises[currentGrammarIndex]?.options.map((option, i) => (
+                        <button
+                          key={i}
+                          onClick={() => handleGrammarSubmitAnswer(option)}
+                          className="lux-button lux-button-secondary"
+                          style={{
+                            padding: '12px',
+                            background: 'rgba(255,255,255,0.04)',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            color: '#ffffff',
+                            borderRadius: '12px'
+                          }}
+                        >
+                          {option}
+                        </button>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
+                ) : (
+                  <div>
+                    <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                      <p style={{ margin: '0 0 12px', color: '#cbd5e1', fontSize: '0.95rem' }}>
+                        {grammarExercises[currentGrammarIndex]?.prompt}
+                      </p>
+                      <h3 style={{ fontSize: '1.4rem', color: '#ffffff', margin: 0, fontWeight: '700', fontStyle: 'italic', lineHeight: '1.5' }}>
+                        "{grammarExercises[currentGrammarIndex]?.sentence}"
+                      </h3>
+                    </div>
 
-              <div style={{ background: 'linear-gradient(135deg, #d1fae5, #ecfdf5)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
-                <h4 style={{ margin: '0 0 10px', color: '#065f46', fontWeight: '700' }}>🧪 Quick Grammar Quiz</h4>
-                <p style={{ color: '#047857', fontSize: '0.9rem', margin: '0 0 6px' }}>Fix this sentence:</p>
-                <p style={{ color: '#1e1b4b', fontSize: '1rem', fontWeight: '600', fontStyle: 'italic', margin: '0 0 14px' }}>"She don't likes to swimming."</p>
-                <button className="lux-button" style={{ padding: '10px 28px', fontSize: '0.95rem' }}>
-                  Start Practice →
-                </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
+                      <input
+                        type="text"
+                        placeholder="Type the corrected sentence here..."
+                        id="grammar-input-field"
+                        style={{
+                          padding: '14px',
+                          borderRadius: '12px',
+                          border: '1px solid rgba(255,255,255,0.15)',
+                          background: 'rgba(0,0,0,0.2)',
+                          color: '#ffffff',
+                          fontSize: '0.95rem',
+                          outline: 'none'
+                        }}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            handleGrammarSubmitAnswer(e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                      />
+                      <button
+                        onClick={() => {
+                          const inputEl = document.getElementById('grammar-input-field');
+                          if (inputEl) {
+                            handleGrammarSubmitAnswer(inputEl.value);
+                            inputEl.value = '';
+                          }
+                        }}
+                        className="lux-button"
+                      >
+                        Submit Corrected Sentence
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
+
+            {grammarSession === 'result' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '700px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                  <span style={{ fontSize: '3rem' }}>📝</span>
+                  <h3 style={{ margin: '10px 0 4px', fontSize: '1.6rem', fontWeight: '800', color: '#ffffff' }}>Grammar Score</h3>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>Your performance breakdown</p>
+                </div>
+
+                <div style={{
+                  width: '110px',
+                  height: '110px',
+                  borderRadius: '50%',
+                  background: `conic-gradient(#10b981 ${grammarScore}%, rgba(255,255,255,0.08) ${grammarScore}% 100%)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 28px',
+                }}>
+                  <div style={{
+                    width: '90px',
+                    height: '90px',
+                    borderRadius: '50%',
+                    backgroundColor: '#110d29',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{ fontSize: '1.8rem', fontWeight: '800', color: '#ffffff' }}>
+                      {grammarScore}%
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '28px', maxHeight: '300px', overflowY: 'auto', paddingRight: '6px' }}>
+                  {grammarFeedback.map((fb, idx) => (
+                    <div key={idx} style={{
+                      padding: '14px',
+                      background: fb.isCorrect ? 'rgba(16, 185, 129, 0.06)' : 'rgba(239, 68, 68, 0.06)',
+                      border: fb.isCorrect ? '1px solid rgba(16, 185, 129, 0.15)' : '1px solid rgba(239, 68, 68, 0.15)',
+                      borderRadius: '12px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                        <span style={{ fontWeight: '700', color: fb.isCorrect ? '#34d399' : '#f87171', fontSize: '0.85rem' }}>
+                          {fb.isCorrect ? '✓ Correct' : '✗ Incorrect'}
+                        </span>
+                        <span style={{ fontSize: '0.8rem', color: '#94a3b8' }}>
+                          Score: {fb.scoreValue}/20
+                        </span>
+                      </div>
+                      <p style={{ margin: '0 0 4px', fontSize: '0.92rem', color: '#ffffff' }}>
+                        <strong>Question:</strong> {fb.exercise.sentence}
+                      </p>
+                      <p style={{ margin: '0 0 6px', fontSize: '0.92rem', color: '#cbd5e1' }}>
+                        <strong>Your answer:</strong> {fb.userAnswer || '[No response]'}
+                      </p>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#a5b4fc', borderTop: '1px dashed rgba(255,255,255,0.06)', paddingTop: '6px' }}>
+                        💡 <strong>Explanation:</strong> {fb.exercise.explanation}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button onClick={startGrammarPractice} className="lux-button" style={{ flex: 1 }}>
+                    🔄 Try Again
+                  </button>
+                  <button onClick={() => setGrammarSession('setup')} className="lux-button lux-button-secondary" style={{ flex: 1, background: 'rgba(255,255,255,0.08)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.1)' }}>
+                    📁 Menu View
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* ========== Pronunciation Coach Module ========== */}
         {activeTab === 'pronunciation' && (
           <div className="feature-container" style={{ animation: 'fadeIn 0.4s ease' }}>
-            <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto' }}>
-              <div style={{ textAlign: 'center', marginBottom: '28px' }}>
-                <span style={{ fontSize: '3rem' }}>🎯</span>
-                <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#1e1b4b' }}>Pronunciation Coach</h3>
-                <p style={{ color: '#64748b', fontSize: '0.95rem' }}>Perfect your pronunciation with AI analysis</p>
-              </div>
+            {pronSession === 'setup' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '800px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                <div style={{ textAlign: 'center', marginBottom: '28px' }}>
+                  <span style={{ fontSize: '3rem' }}>🎯</span>
+                  <h3 style={{ margin: '10px 0 6px', fontSize: '1.6rem', fontWeight: '800', color: '#ffffff' }}>Pronunciation Coach</h3>
+                  <p style={{ color: '#cbd5e1', fontSize: '0.95rem' }}>Perfect your pronunciation with real-time AI analysis</p>
+                </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
-                {[
-                  { icon: '🎙️', title: 'Record Voice', desc: 'Record and analyze your speech' },
-                  { icon: '📊', title: 'Pronunciation Score', desc: 'Get accuracy percentage' },
-                  { icon: '🌍', title: 'Accent Feedback', desc: 'Improve your accent clarity' },
-                  { icon: '💪', title: 'Difficult Words', desc: 'Practice challenging words' },
-                  { icon: '🏆', title: 'Fluency Score', desc: 'Track your speaking flow' },
-                  { icon: '💡', title: 'AI Tips & Corrections', desc: 'Personalized speaking tips' },
-                ].map((item, i) => (
-                  <div key={i} style={{
-                    background: 'rgba(245, 158, 11, 0.06)',
-                    border: '1px solid rgba(245, 158, 11, 0.12)',
-                    borderRadius: '14px',
-                    padding: '16px',
-                    display: 'flex',
-                    alignItems: 'flex-start',
-                    gap: '12px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}>
-                    <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
-                    <div>
-                      <div style={{ fontWeight: '700', color: '#1e1b4b', fontSize: '0.92rem' }}>{item.title}</div>
-                      <div style={{ color: '#64748b', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px', marginBottom: '24px' }}>
+                  {[
+                    { icon: '🎙️', title: 'Record Voice', desc: 'Record and analyze your speech' },
+                    { icon: '📊', title: 'Pronunciation Score', desc: 'Get accuracy percentage' },
+                    { icon: '🌍', title: 'Accent Feedback', desc: 'Improve your accent clarity' },
+                    { icon: '💪', title: 'Difficult Words', desc: 'Practice challenging words' },
+                    { icon: '🏆', title: 'Fluency Score', desc: 'Track your speaking flow' },
+                    { icon: '💡', title: 'AI Tips & Corrections', desc: 'Personalized speaking tips' },
+                  ].map((item, i) => (
+                    <div key={i} style={{
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.08)',
+                      borderRadius: '14px',
+                      padding: '16px',
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: '12px'
+                    }}>
+                      <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{item.icon}</span>
+                      <div>
+                        <div style={{ fontWeight: '700', color: '#ffffff', fontSize: '0.92rem' }}>{item.title}</div>
+                        <div style={{ color: '#cbd5e1', fontSize: '0.8rem', marginTop: '3px' }}>{item.desc}</div>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
 
-              <div style={{ background: 'linear-gradient(135deg, #fef3c7, #fffbeb)', borderRadius: '16px', padding: '24px', textAlign: 'center' }}>
-                <h4 style={{ margin: '0 0 10px', color: '#92400e', fontWeight: '700' }}>🎤 Try Saying This Word</h4>
-                <p style={{ color: '#1e1b4b', fontSize: '1.8rem', fontWeight: '800', margin: '0 0 6px', letterSpacing: '2px' }}>Entrepreneurship</p>
-                <p style={{ color: '#b45309', fontSize: '0.85rem', margin: '0 0 14px' }}>/ˌɒn.trə.prəˈnɜː.ʃɪp/</p>
-                <button className="lux-button" style={{ padding: '10px 28px', fontSize: '0.95rem' }}>
-                  Start Practice →
-                </button>
+                <div style={{ background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.2)', borderRadius: '16px', padding: '24px', textAlign: 'center', marginBottom: '24px' }}>
+                  <h4 style={{ margin: '0 0 10px', color: '#fde68a', fontWeight: '700' }}>🎤 Hard Pronunciation Word</h4>
+                  <p style={{ color: '#ffffff', fontSize: '1.8rem', fontWeight: '800', margin: '0 0 6px', letterSpacing: '2px' }}>Entrepreneurship</p>
+                  <p style={{ color: '#fde68a', fontSize: '0.85rem', margin: '0 0 14px' }}>/ˌɒn.trə.prəˈnɜː.ʃɪp/</p>
+                </div>
+                
+                <div style={{ textAlign: 'center' }}>
+                  <button onClick={startPronPractice} className="lux-button" style={{ padding: '12px 36px', fontSize: '1rem', width: '100%', maxWidth: '280px' }}>
+                    Start Practice →
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
+
+            {pronSession === 'practice' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '650px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff' }}>
+                <div style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontSize: '0.9rem', background: 'rgba(255,255,255,0.08)', padding: '4px 12px', borderRadius: '12px' }}>
+                    Word {currentPronIndex + 1} of 4
+                  </span>
+                </div>
+
+                <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                  <p style={{ margin: '0 0 8px', color: '#cbd5e1', fontSize: '0.95rem' }}>Listen carefully and repeat the word:</p>
+                  <h3 style={{ fontSize: '2.2rem', color: '#ffffff', margin: '0 0 4px', fontWeight: '800' }}>
+                    {pronWords[currentPronIndex]?.word}
+                  </h3>
+                  <p style={{ fontSize: '1rem', color: '#a5b4fc', margin: '0 0 12px' }}>
+                    {pronWords[currentPronIndex]?.phonetic}
+                  </p>
+                  <button 
+                    onClick={() => speakText(pronWords[currentPronIndex]?.word)}
+                    className="lux-button lux-button-secondary"
+                    style={{ padding: '6px 16px', fontSize: '0.85rem', height: '32px', background: 'rgba(255,255,255,0.1)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.2)' }}
+                  >
+                    🔊 Listen Audio
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: '20px', marginBottom: '32px' }}>
+                  <button
+                    onClick={startListening}
+                    disabled={isListening}
+                    className={`lux-button ${isListening ? 'listening' : ''}`}
+                    style={{
+                      background: isListening ? '#ef4444' : '#6366f1',
+                      padding: '14px 28px',
+                      fontSize: '1rem',
+                      fontWeight: '700',
+                      boxShadow: isListening ? '0 0 16px rgba(239, 68, 68, 0.4)' : 'none'
+                    }}
+                  >
+                    {isListening ? '🎙️ Listening... Speak Now' : '🎤 Click & Say Word'}
+                  </button>
+
+                  {pronAttempt && (
+                    <div style={{ width: '100%', background: 'rgba(255,255,255,0.03)', padding: '16px', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.08)' }}>
+                      <p style={{ margin: '0 0 10px', fontSize: '0.95rem' }}>
+                        <strong>Your pronunciation attempt:</strong> <span style={{ color: '#a5b4fc' }}>"{pronAttempt}"</span>
+                      </p>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+                        <span style={{ fontSize: '0.9rem' }}>Accuracy Score:</span>
+                        <span style={{ fontSize: '1.2rem', fontWeight: '800', color: pronScore >= 80 ? '#34d399' : pronScore >= 60 ? '#fbbf24' : '#f87171' }}>
+                          {pronScore}%
+                        </span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: '0.85rem', color: '#cbd5e1', borderTop: '1px dashed rgba(255,255,255,0.06)', paddingTop: '6px' }}>
+                        💡 <strong>Coach Tip:</strong> {pronFeedback}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex' }}>
+                  <button
+                    onClick={handleNextPronWord}
+                    disabled={!pronAttempt}
+                    className="lux-button"
+                    style={{ flex: 1 }}
+                  >
+                    {currentPronIndex < 3 ? 'Next Word →' : 'View Summary Results 🏆'}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {pronSession === 'result' && (
+              <div className="lux-card" style={{ padding: '32px', maxWidth: '600px', margin: '0 auto', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.08)', color: '#ffffff', textAlign: 'center' }}>
+                <span style={{ fontSize: '4rem' }}>🏆</span>
+                <h3 style={{ margin: '12px 0 6px', fontSize: '1.8rem', fontWeight: '800', color: '#ffffff' }}>Practice Completed!</h3>
+                <p style={{ color: '#cbd5e1', fontSize: '1rem', margin: '0 0 24px' }}>Here is your Pronunciation score:</p>
+
+                <div style={{
+                  width: '130px',
+                  height: '130px',
+                  borderRadius: '50%',
+                  background: `conic-gradient(#f59e0b ${pronScore}%, rgba(255,255,255,0.08) ${pronScore}% 100%)`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto 28px',
+                }}>
+                  <div style={{
+                    width: '110px',
+                    height: '110px',
+                    borderRadius: '50%',
+                    backgroundColor: '#110d29',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <span style={{ fontSize: '2.2rem', fontWeight: '800', color: '#ffffff' }}>
+                      {pronScore}%
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
+                  <button onClick={startPronPractice} className="lux-button" style={{ flex: 1 }}>
+                    🔄 Practice Again
+                  </button>
+                  <button onClick={() => setPronSession('setup')} className="lux-button lux-button-secondary" style={{ flex: 1, background: 'rgba(255,255,255,0.08)', color: '#ffffff', borderColor: 'rgba(255,255,255,0.1)' }}>
+                    📁 Menu View
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

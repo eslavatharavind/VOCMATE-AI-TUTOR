@@ -200,51 +200,51 @@
   position: relative;
 }
 
-/* Individual feature menu card styling - Compact Premium */
+/* Individual feature menu card styling - Compact Premium Glassmorphism */
 .menu-card {
-  background: rgba(255, 255, 255, 0.7);
-  border-radius: 20px;
-  padding: 22px 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  padding: 18px 16px;
   text-align: center;
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  border: 1px solid rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  backdrop-filter: blur(12px);
-  box-shadow: inset 0 0 12px rgba(255, 255, 255, 0.4), 0 6px 16px -4px rgba(0, 0, 0, 0.07);
+  justify-content: space-between;
+  gap: 12px;
+  height: 210px;
+  box-sizing: border-box;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.1);
 }
 
 /* Hover state for menu cards - The "Wow" effect */
 .menu-card:hover {
-  /* Light lift and slight scale */
-  transform: translateY(-12px) scale(1.03);
-  /* Bright white backgorund */
-  background: rgba(255, 255, 255, 0.95);
-  /* Intense indigo glow shadow */
-  box-shadow: 0 30px 60px -12px rgba(79, 70, 229, 0.18), 0 18px 36px -18px rgba(0, 0, 0, 0.12);
-  /* Border color transition */
-  border-color: rgba(79, 70, 229, 0.2);
+  transform: translateY(-8px) scale(1.02);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 15px 35px -8px rgba(99, 102, 241, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.2);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 
 /* Style for the icon in the card */
 .menu-card-icon {
-  font-size: 2.4rem;
+  font-size: 2.2rem;
   margin-bottom: 0;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Icon animation on card hover */
 .menu-card:hover .menu-card-icon {
-  transform: scale(1.15) rotate(5deg);
+  transform: scale(1.1) rotate(5deg);
 }
 
 /* Card heading styling */
 .menu-card h4 {
-  color: #1e1b4b;
-  font-size: 1.05rem;
+  color: #ffffff;
+  font-size: 1rem;
   margin: 0;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -252,38 +252,38 @@
 
 /* Card description styling */
 .menu-card p {
-  color: #4338ca;
-  font-size: 0.82rem;
-  line-height: 1.4;
+  color: #cbd5e1;
+  font-size: 0.78rem;
+  line-height: 1.35;
   margin: 0;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 /* Card CTA Button - Arrow or "Start" button */
 .menu-card .start-btn {
-  margin-top: 4px;
+  margin-top: auto;
   background: linear-gradient(135deg, #6366f1, #4f46e5);
   color: white;
   border: none;
-  padding: 7px 18px;
-  border-radius: 10px;
+  padding: 6px 16px;
+  border-radius: 8px;
   font-weight: 700;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 3px 8px rgba(99, 102, 241, 0.2);
 }
 
 .menu-card .start-btn.coming-soon {
-  background: #e2e8f0 !important;
-  color: #64748b !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #94a3b8 !important;
   box-shadow: none !important;
   cursor: not-allowed !important;
 }
 
 .menu-card:hover .start-btn {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.35);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(99, 102, 241, 0.4);
 }
 
 /* --- Global Sub-Module Styling (Fixing visibility and unstyled elements) --- */

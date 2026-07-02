@@ -365,8 +365,8 @@ body {
 
 /* Brand logo — transparent, no container */
 .brand-logo {
-  width: 100px;
-  height: 100px;
+  width: 130px;
+  height: 130px;
   object-fit: contain;
   background: transparent;
   border: none;
@@ -669,8 +669,8 @@ body {
 /* Tablet */
 @media (max-width: 1024px) and (min-width: 769px) {
   .brand-logo {
-    width: 85px;
-    height: 85px;
+    width: 110px;
+    height: 110px;
   }
 
   .dashboard-header {
@@ -711,8 +711,8 @@ body {
 
   /* Brand logo mobile size */
   .brand-logo {
-    width: 65px;
-    height: 65px;
+    width: 85px;
+    height: 85px;
   }
 
   .dashboard-header h1 {
