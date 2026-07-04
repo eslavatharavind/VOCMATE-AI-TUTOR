@@ -2,12 +2,26 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 
+// 10 Features list
+const FEATURES = [
+  { icon: "🎙️", title: "AI Voice Conversations", desc: "Speak naturally with our advanced AI voices that mimic real human cadence and rhythm." },
+  { icon: "🗣️", title: "Pronunciation Feedback", desc: "Get targeted pointers on how to articulate specific vowel sounds and syllable accents." },
+  { icon: "🧠", title: "Grammar Correction", desc: "See corrections on phrasing, verb tenses, and context in real-time." },
+  { icon: "📖", title: "Reading Practice", desc: "Read passages aloud and check your speed, pauses, and articulation." },
+  { icon: "🎧", title: "Shadowing Practice", desc: "Repeat sentences directly after a native speaker to master rhythm and speech flow." },
+  { icon: "💼", title: "AI Interview Simulator", desc: "Prepare for jobs with realistic tech, product, or sales interview prompts." },
+  { icon: "✈️", title: "Real-Life Conversation Scenarios", desc: "Simulate speaking at a restaurant, hotel front desk, airport customs, or retail shopping." },
+  { icon: "📊", title: "Progress Tracking", desc: "Monitor grammar accuracy over time and view customized vocab review sheets." },
+  { icon: "🤖", title: "Multiple AI Avatars", desc: "Switch accents, speaking speeds, and avatar personalities anytime." },
+  { icon: "🎯", title: "Personalized Learning Experience", desc: "Vocabulary adapts dynamically to match your verbal level and flow." }
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   return (
-    <div className="landing-page-container">
+    <div className="home-container">
       {/* Decorative ambient glowing backdrops */}
       <div className="bg-blob-1"></div>
       <div className="bg-blob-2"></div>
@@ -31,6 +45,7 @@ export default function Home() {
         </button>
 
         <nav className={`header-nav ${isMenuOpen ? "active" : ""}`}>
+          <a href="#features" className="nav-link" onClick={() => setIsMenuOpen(false)}>Features</a>
           <a href="#how-it-works" className="nav-link" onClick={() => setIsMenuOpen(false)}>How It Works</a>
           <button className="nav-signin-btn" onClick={() => { setIsMenuOpen(false); navigate("/signin"); }}>
             Login
@@ -49,7 +64,7 @@ export default function Home() {
               Speak English Confidently with Your Personal <span className="text-highlight">VOCMATE</span> AI Tutor
             </h2>
             <p className="hero-subtitle">
-              Practice real conversations, improve pronunciation, receive grammar feedback, and build confidence with your AI speaking partner.
+              Practice real conversations, improve pronunciation, receive grammar feedback, and build confidence using your AI speaking partner.
             </p>
             <div className="hero-actions">
               <button className="primary-btn pulse" onClick={() => navigate("/signup")}>
@@ -91,7 +106,24 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 3. How It Works Section */}
+      {/* 3. Features Section */}
+      <section id="features" className="section-padding">
+        <div className="section-header-centered">
+          <span className="section-label">FEATURES</span>
+          <h3 className="section-title">Everything You Need to Master Spoken English</h3>
+        </div>
+        <div className="why-grid">
+          {FEATURES.map((feat, index) => (
+            <div key={index} className="why-card">
+              <div className="why-icon">{feat.icon}</div>
+              <h5>{feat.title}</h5>
+              <p>{feat.desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* 4. How It Works Section */}
       <section id="how-it-works" className="section-padding alternate-bg">
         <div className="section-header-centered">
           <span className="section-label">THE PROCESS</span>
@@ -124,7 +156,57 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 4. Call to Action Section */}
+      {/* 5. AI Tutor Preview Section */}
+      <section className="section-padding">
+        <div className="preview-split">
+          <div className="preview-info">
+            <span className="section-label">AI TUTOR PREVIEW</span>
+            <h3 className="section-title">Real-Time Conversation & Score Analysis</h3>
+            <p className="section-desc-para">
+              Experience what it is like to practice with a structured, instant feedback system. Check pronunciation metrics and grammar adjustments in a split second.
+            </p>
+            <div className="stats-box">
+              <div className="metric">
+                <span className="val">98%</span>
+                <span className="lbl">Grammar</span>
+              </div>
+              <div className="metric">
+                <span className="val">92%</span>
+                <span className="lbl">Fluency</span>
+              </div>
+              <div className="metric">
+                <span className="val">95%</span>
+                <span className="lbl">Confidence</span>
+              </div>
+            </div>
+          </div>
+          <div className="preview-chat-container">
+            <div className="chat-window">
+              <div className="chat-header-bar">
+                <span className="dot red"></span>
+                <span className="dot yellow"></span>
+                <span className="dot green"></span>
+                <span className="chat-title">VocMate Live Feedback</span>
+              </div>
+              <div className="chat-body">
+                <div className="preview-bubble user">
+                  <p>I would like to ordering a coffee, please.</p>
+                </div>
+                <div className="preview-bubble feedback">
+                  <div className="fb-tag">💡 GRAMMAR CORRECTION</div>
+                  <p>Instead of <strong>"to ordering"</strong>, say <strong>"to order"</strong>.</p>
+                  <p className="alternative">"I would like to order a coffee, please."</p>
+                </div>
+                <div className="preview-bubble ai">
+                  <p>Sure! Would you like milk or sugar in your coffee?</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Call to Action Section */}
       <section className="final-cta-section">
         <div className="final-cta-card">
           <h3>Ready to Speak English with Confidence?</h3>
@@ -135,7 +217,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 5. Footer */}
+      {/* 7. Footer */}
       <footer className="footer-section">
         <div className="footer-links-grid">
           <div className="footer-brand-column">
@@ -144,6 +226,7 @@ export default function Home() {
           </div>
           <div className="footer-links-col">
             <h6>Navigation</h6>
+            <a href="#features">Features</a>
             <a href="#how-it-works">How It Works</a>
           </div>
           <div className="footer-links-col">

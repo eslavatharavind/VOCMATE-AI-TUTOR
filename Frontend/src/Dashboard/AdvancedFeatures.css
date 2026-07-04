@@ -357,6 +357,37 @@
   color: #ffffff;
 }
 
+/*
+ * Analytics panel fix: this section was authored as light cards with dark text
+ * (dark navy #1e1b4b headings, pastel inner panels), but the default .lux-card is
+ * dark, which made all the text invisible. Render these cards light so the whole
+ * analytics panel is readable and consistent with the already-white badges card.
+ */
+.progress-dashboard .lux-card {
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.55);
+  color: #1e1b4b;
+}
+
+/*
+ * The Speaking Challenge and Scenario Simulator selection/detail screens were also
+ * authored with dark navy text, but their cards render dark - so the headings, labels
+ * and prompts were invisible. Force them light. The live conversation interface is
+ * correctly dark-themed already, so it is explicitly excluded.
+ */
+.daily-challenge .lux-card h3,
+.daily-challenge .lux-card h4,
+.daily-challenge .lux-card h5,
+.daily-challenge .lux-card label,
+.daily-challenge .lux-card .challenge-text,
+.conversation-simulator .lux-card:not(.conversation-interface) h3,
+.conversation-simulator .lux-card:not(.conversation-interface) h4,
+.conversation-simulator .lux-card:not(.conversation-interface) h5,
+.conversation-simulator .lux-card:not(.conversation-interface) label {
+  color: #f1f5f9 !important;
+}
+
 /* Shared Premium Button Styling for all sub-features */
 .lux-button {
   background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);

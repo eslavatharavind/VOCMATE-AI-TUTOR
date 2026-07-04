@@ -180,6 +180,18 @@ const AdvancedFeatures = (props) => {
   
   // Ref to handle SpeechRecognition.onresult callback dynamically and avoid React stale closures
   const onSpeechRecognizedRef = useRef(null);
+  // Ref for live (interim) transcript so modules can show words as the user speaks
+  const onInterimTranscriptRef = useRef(null);
+
+  // --- Deepgram streaming STT (reliable, cross-browser — same engine as the main tutor) ---
+  const dgSocketRef = useRef(null);
+  const dgRecorderRef = useRef(null);
+  const dgStreamRef = useRef(null);
+  const dgBufferRef = useRef([]);
+  const dgSilenceRef = useRef(null);
+  const dgMaxRef = useRef(null); // safety cap so a single-shot recording can't get stuck
+  const dgContinuousRef = useRef(false); // keep streaming for timed challenges
+  const isListeningRef = useRef(false);
 
   // Fetch the backend API URL from environment variables, defaulting to localhost
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:10000';
@@ -195,6 +207,10 @@ const AdvancedFeatures = (props) => {
 
   // Handle tab changes with data loading
   useEffect(() => {
+    // Release the microphone if a recording was active when switching modules
+    if (isListeningRef.current) {
+      stopListening();
+    }
     if (activeTab) {
       // Clear specific ephemeral states when switching tabs
       setSpokenText('');
@@ -205,6 +221,15 @@ const AdvancedFeatures = (props) => {
       setPronSession('setup');
     }
   }, [activeTab]);
+
+  // Release the microphone when the component unmounts
+  useEffect(() => {
+    return () => {
+      if (isListeningRef.current) {
+        stopListening();
+      }
+    };
+  }, []);
 
   // Trigger confetti milestone celebration when progress dashboard displays milestone celebration today
   useEffect(() => {
@@ -305,18 +330,153 @@ const AdvancedFeatures = (props) => {
     }
   };
 
-  // Function to trigger the speech recognition process
-  const startListening = () => {
-    if (recognition) {
-      try {
-        // Clear old results before starting again
-        setSpokenText('');
-        recognition.start();
-      } catch (error) {
-        console.error('Error starting speech recognition:', error);
+  // Stop any active Deepgram listening session and release the microphone
+  const stopListening = () => {
+    if (dgSilenceRef.current) {
+      clearTimeout(dgSilenceRef.current);
+      dgSilenceRef.current = null;
+    }
+    if (dgMaxRef.current) {
+      clearTimeout(dgMaxRef.current);
+      dgMaxRef.current = null;
+    }
+    try {
+      if (dgRecorderRef.current && dgRecorderRef.current.state === 'recording') {
+        dgRecorderRef.current.stop();
       }
-    } else {
-      alert('Speech recognition is not supported in this browser. Please use Chrome or Edge.');
+      if (dgStreamRef.current) {
+        dgStreamRef.current.getTracks().forEach(track => track.stop());
+      }
+      if (dgSocketRef.current && dgSocketRef.current.readyState === WebSocket.OPEN) {
+        dgSocketRef.current.close();
+      }
+    } catch (err) {
+      console.error('Error stopping listening:', err);
+    }
+    dgRecorderRef.current = null;
+    dgStreamRef.current = null;
+    dgSocketRef.current = null;
+    dgContinuousRef.current = false;
+    isListeningRef.current = false;
+    setIsListening(false);
+  };
+
+  // Start voice capture using Deepgram real-time STT. Reliable across browsers and
+  // gives clear feedback if the microphone is blocked (fixes silent "no recording").
+  const startListening = async () => {
+    // Already recording? Treat a second trigger as "finish": send whatever we captured, then stop.
+    if (isListeningRef.current) {
+      if (!dgContinuousRef.current) {
+        const finalText = dgBufferRef.current.join(' ').trim();
+        if (finalText && onSpeechRecognizedRef.current) onSpeechRecognizedRef.current(finalText);
+      }
+      stopListening();
+      return;
+    }
+
+    const deepgramApiKey = import.meta.env.VITE_DEEPGRAM_API_KEY;
+    if (!deepgramApiKey) {
+      alert('Speech service is not configured. Please add a Deepgram API key.');
+      return;
+    }
+
+    // Timed challenges keep the mic open and accumulate the whole answer.
+    dgContinuousRef.current = !!isChallengeActiveRef.current;
+    setSpokenText('');
+    dgBufferRef.current = [];
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true }
+      });
+    } catch (err) {
+      console.error('Microphone access error:', err);
+      alert('Could not access your microphone. Please allow microphone access in your browser and try again.');
+      setIsListening(false);
+      return;
+    }
+
+    dgStreamRef.current = stream;
+    isListeningRef.current = true;
+    setIsListening(true);
+
+    // Safety cap for single-shot modes: auto-finish so the mic can never get stuck on.
+    if (!dgContinuousRef.current) {
+      dgMaxRef.current = setTimeout(() => {
+        const finalText = dgBufferRef.current.join(' ').trim();
+        if (finalText && onSpeechRecognizedRef.current) onSpeechRecognizedRef.current(finalText);
+        stopListening();
+      }, 20000);
+    }
+
+    try {
+      const socket = new WebSocket(
+        `wss://api.deepgram.com/v1/listen?${new URLSearchParams({
+          model: 'nova-2', language: 'en-US', interim_results: 'true', endpointing: '2500', punctuate: 'true'
+        })}`,
+        ['token', deepgramApiKey]
+      );
+      dgSocketRef.current = socket;
+
+      socket.onopen = () => {
+        if (!dgStreamRef.current) return;
+        const recorder = new MediaRecorder(dgStreamRef.current, { mimeType: 'audio/webm;codecs=opus' });
+        dgRecorderRef.current = recorder;
+        recorder.ondataavailable = (e) => {
+          if (socket.readyState === WebSocket.OPEN && e.data.size > 0) socket.send(e.data);
+        };
+        recorder.start(250);
+      };
+
+      socket.onmessage = (message) => {
+        try {
+          const data = JSON.parse(message.data);
+          const piece = data?.channel?.alternatives?.[0]?.transcript?.trim();
+          if (!piece) return;
+
+          if (data.is_final) {
+            dgBufferRef.current.push(piece);
+            const full = dgBufferRef.current.join(' ').trim();
+            setSpokenText(full);
+
+            if (dgContinuousRef.current) {
+              // Challenge: feed each finalized phrase to the shared handler (it accumulates).
+              if (onSpeechRecognizedRef.current) onSpeechRecognizedRef.current(piece);
+            } else {
+              // Single-shot: finalize shortly after the user stops talking.
+              if (dgSilenceRef.current) clearTimeout(dgSilenceRef.current);
+              dgSilenceRef.current = setTimeout(() => {
+                const finalText = dgBufferRef.current.join(' ').trim();
+                if (finalText && onSpeechRecognizedRef.current) onSpeechRecognizedRef.current(finalText);
+                stopListening();
+              }, 1200);
+            }
+          } else {
+            // Show interim words live for responsiveness.
+            const preview = (dgBufferRef.current.join(' ') + ' ' + piece).trim();
+            setSpokenText(preview);
+            // Also surface the live words in modules that show them in an input box
+            if (onInterimTranscriptRef.current) onInterimTranscriptRef.current(preview);
+          }
+        } catch (err) {
+          console.error('Deepgram message error:', err);
+        }
+      };
+
+      socket.onerror = () => {
+        console.error('Speech connection error.');
+        setIsListening(false);
+      };
+
+      socket.onclose = () => {
+        isListeningRef.current = false;
+        setIsListening(false);
+      };
+    } catch (err) {
+      console.error('Error starting Deepgram session:', err);
+      alert('Could not start the speech service. Please try again.');
+      stopListening();
     }
   };
 
@@ -560,6 +720,15 @@ const AdvancedFeatures = (props) => {
       } else if (activeTab === 'pronunciation') {
         setPronAttempt(transcript);
         evaluatePronunciation(transcript);
+      }
+    };
+
+    // Live interim words — show them the moment the user starts speaking so it is
+    // obvious the mic is recording (the conversation input otherwise stays empty
+    // until the phrase is finalized).
+    onInterimTranscriptRef.current = (preview) => {
+      if (activeTab === 'conversation') {
+        setSimulatorInputText(preview);
       }
     };
   });
@@ -935,10 +1104,8 @@ const AdvancedFeatures = (props) => {
       clearInterval(timerIntervalRef.current);
       timerIntervalRef.current = null;
     }
-    if (recognition && isListening) {
-      try {
-        recognition.stop();
-      } catch (err) {}
+    if (isListeningRef.current) {
+      stopListening();
     }
     
     // Reset all sub-challenge states
@@ -971,10 +1138,8 @@ const AdvancedFeatures = (props) => {
 
   // Unified evaluation submit call
   const submitChallengeEvaluation = async (type, extraData = {}) => {
-    if (recognition && isListening) {
-      try {
-        recognition.stop();
-      } catch (err) {}
+    if (isListeningRef.current) {
+      stopListening();
     }
     setIsChallengeLoading(true);
     
@@ -1012,10 +1177,11 @@ const AdvancedFeatures = (props) => {
     setIsChallengeTimeUp(false);
     setSpokenText('');
     setIsJamActive(true);
-    
+    isChallengeActiveRef.current = true; // stream continuously for the timed challenge
+
     const durationSeconds = 60;
     setChallengeTimeLeft(durationSeconds);
-    
+
     startListening();
     
     let secondsLeft = durationSeconds;
@@ -1053,10 +1219,11 @@ const AdvancedFeatures = (props) => {
     setIsChallengeTimeUp(false);
     setSpokenText('');
     setIsPictureActive(true);
-    
+    isChallengeActiveRef.current = true; // stream continuously for the timed challenge
+
     const durationSeconds = 60;
     setChallengeTimeLeft(durationSeconds);
-    
+
     startListening();
     
     let secondsLeft = durationSeconds;
@@ -1094,10 +1261,11 @@ const AdvancedFeatures = (props) => {
     setIsChallengeTimeUp(false);
     setSpokenText('');
     setIsStoryActive(true);
-    
+    isChallengeActiveRef.current = true; // stream continuously for the timed challenge
+
     const durationSeconds = 120; // 2 minutes
     setChallengeTimeLeft(durationSeconds);
-    
+
     startListening();
     
     let secondsLeft = durationSeconds;
@@ -1125,10 +1293,11 @@ const AdvancedFeatures = (props) => {
     setIsChallengeTimeUp(false);
     setSpokenText('');
     setIsDebateActive(true);
-    
+    isChallengeActiveRef.current = true; // stream continuously for the timed challenge
+
     const durationSeconds = debateDuration * 60;
     setChallengeTimeLeft(durationSeconds);
-    
+
     startListening();
     
     let secondsLeft = durationSeconds;
@@ -1188,8 +1357,8 @@ const AdvancedFeatures = (props) => {
     setRoleplayInputText('');
     setRoleplayScenario(scenario);
     
-    if (recognition && isListening) {
-      try { recognition.stop(); } catch (err) {}
+    if (isListeningRef.current) {
+      stopListening();
     }
     
     try {
@@ -1591,19 +1760,11 @@ const AdvancedFeatures = (props) => {
         {/* Main Dashboard Menu Overlay */}
         {!activeTab && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '100%' }}>
-            <h2 className="section-title" style={{ margin: '0 0 20px 0', fontSize: '2rem', color: '#1e1b4b', fontWeight: '800', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <h2 className="section-title" style={{ margin: '0 0 20px 0', fontSize: '2rem', color: '#f1f5f9', fontWeight: '800', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
               ✨ Advanced Features
             </h2>
             
             <div className="features-menu-grid">
-              {/* 1. AI Speaking Coach */}
-              <div className="menu-card" onClick={() => navigate('/practice-topics')}>
-                <div className="menu-card-icon">🎤</div>
-                <h4>AI Speaking Coach</h4>
-                <p>Practice real-time AI conversations.</p>
-                <button className="start-btn">Start →</button>
-              </div>
-
               {/* 2. Reading Practice */}
               <div className="menu-card" onClick={() => setActiveTab('reading')}>
                 <div className="menu-card-icon">📖</div>
@@ -1708,7 +1869,7 @@ const AdvancedFeatures = (props) => {
             )}
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '25px' }}>
-              <h2 id="dashboard-analytics-heading" className="section-title" style={{ margin: 0, fontSize: '2rem', color: '#1e1b4b', fontWeight: '800', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <h2 id="dashboard-analytics-heading" className="section-title" style={{ margin: 0, fontSize: '2rem', color: '#f1f5f9', fontWeight: '800', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '10px' }}>
                 📊 Analytics
               </h2>
               <button onClick={loadProgressData} className="lux-button lux-button-secondary" style={{ padding: '8px 16px', fontSize: '0.88rem', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -2002,7 +2163,7 @@ const AdvancedFeatures = (props) => {
                 {spokenText && (
                   <div className="spoken-review">
                     <p><strong>Your Attempt:</strong> "{spokenText}"</p>
-                    <button onClick={evaluateShadowing} className="lux-button">
+                    <button onClick={() => evaluateShadowing(spokenText)} className="lux-button">
                       ✨ Get Feedback
                     </button>
                   </div>

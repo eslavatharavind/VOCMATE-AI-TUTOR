@@ -480,21 +480,23 @@ function VocMateTutor() {
 
       {!permissionsGranted ? (
         <div className='pre_session'>
-          <h2 className='vocmate_rules'>📚 VocMate Tutoring Guidelines</h2>
-          <ul className='rules'>
-            <li>Ensure your microphone and camera are working properly.</li>
-            <li>Find a quiet, well-lit place to focus on learning.</li>
-            <li>Speak clearly and don't hesitate to ask questions.</li>
-            <li>Practice pronunciation, grammar, vocabulary, or conversation skills.</li>
-            <li>Take your time - learning is a process, not a race.</li>
-            <li>Feel free to ask for explanations, examples, or corrections.</li>
-            <li>We respect your privacy — no audio or video recordings are saved.</li>
-            <li>If you encounter any issues, feel free to contact us anytime.</li>
-            <li>Allow access to your camera and microphone to begin learning.</li>
-          </ul>
+          <div className="pre-session-avatar">
+            <img src={`/avatars/${voiceId || 'cgSgspJ2msm6clMCkdW9'}.png`} alt="Your AI Tutor" />
+            <span className="pre-session-avatar-ring"></span>
+          </div>
+          <span className="pre-session-eyebrow">READY TO PRACTICE</span>
+          <h2 className='vocmate_rules'>
+            {decodeURIComponent(topic || 'General conversation') === 'General conversation'
+              ? 'Free Conversation'
+              : decodeURIComponent(topic)}
+          </h2>
+          <p className="pre-session-desc">
+            Your AI tutor is ready to talk. Enable your camera and microphone to begin your live speaking session.
+          </p>
           <button onClick={requestPermissions} className='start_session_btn'>
-            Start Learning Session
+            🎙️ Enable Camera &amp; Start
           </button>
+          <p className="pre-session-note">🔒 Your privacy is respected — no audio or video is ever saved.</p>
         </div>
       ) : (
         <div className='active_session'>

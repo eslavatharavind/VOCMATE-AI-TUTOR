@@ -229,7 +229,9 @@ export default function Dashboard() {
       </div>
       <div className="dashboard-header">
         <div className="header-left">
-          <img src="/logo.png" alt="VocMate AI Tutor" className="brand-logo" />
+          <div className="brand-logo-frame" onClick={() => navigate('/dashboard')}>
+            <img src="/logo.png" alt="VocMate AI Tutor" className="brand-logo" />
+          </div>
           <div className="dashboard-intro-typing">
             <span className="typing-text">{displayedText}</span>
             <span className="typing-cursor">|</span>
